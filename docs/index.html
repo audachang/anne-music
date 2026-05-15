@@ -2,31 +2,114 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8">
-<title>Anne 2026 暑期管樂團／管樂營 (北北桃)</title>
+<title>Anne 2026 夏令營搜尋清單</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <style>
+  :root {
+    --blue: #1f4e78;
+    --blue-dark: #173b5b;
+    --gold: #8d6a2c;
+    --bg: #f7f8fa;
+    --border: #d9e0ea;
+    --text: #1a2330;
+    --muted: #5c6b80;
+  }
   body {
     font-family: "Noto Sans TC", "Microsoft JhengHei", "PingFang TC", sans-serif;
     margin: 0;
     padding: 32px 20px;
-    background: #f7f8fa;
-    color: #1a2330;
+    background: var(--bg);
+    color: var(--text);
     line-height: 1.65;
   }
-  .wrap { max-width: 1000px; margin: 0 auto; }
+  .wrap { max-width: 1080px; margin: 0 auto; }
   h1 {
-    font-size: 1.4rem;
-    color: #1f4e78;
+    font-size: 1.45rem;
+    color: var(--blue);
     margin: 0 0 4px;
   }
   .sub {
-    color: #5c6b80;
+    color: var(--muted);
     font-size: 0.92rem;
-    margin-bottom: 24px;
+    margin-bottom: 18px;
   }
+  .tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 8px 0 18px;
+  }
+  .tab-input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .tab-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: #fff;
+    color: var(--blue);
+    cursor: pointer;
+    font-weight: 700;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  }
+  .tab-label:hover { border-color: var(--blue); }
+  .tab-count {
+    min-width: 1.4em;
+    padding: 1px 7px;
+    border-radius: 999px;
+    background: #eef3f8;
+    color: var(--muted);
+    font-size: 0.78rem;
+    text-align: center;
+  }
+  .tab-panel { display: none; }
+  
+  #tab-music:checked ~ .tabs label[for="tab-music"] {
+    background: #1f4e78;
+    border-color: #1f4e78;
+    color: #fff;
+  }
+  #tab-music:checked ~ .tabs label[for="tab-music"] .tab-count {
+    background: rgba(255,255,255,0.2);
+    color: #fff;
+  }
+  #tab-music:checked ~ .panel-music { display: block; }
+  
+  #tab-performing-arts:checked ~ .tabs label[for="tab-performing-arts"] {
+    background: #7c3f8c;
+    border-color: #7c3f8c;
+    color: #fff;
+  }
+  #tab-performing-arts:checked ~ .tabs label[for="tab-performing-arts"] .tab-count {
+    background: rgba(255,255,255,0.2);
+    color: #fff;
+  }
+  #tab-performing-arts:checked ~ .panel-performing-arts { display: block; }
+  
+  .topic-heading {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 18px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+  .topic-heading h2 {
+    margin: 0 0 4px;
+    color: var(--blue);
+    font-size: 1.2rem;
+  }
+  .topic-heading p { margin: 0; color: var(--muted); font-size: 0.94rem; }
   h2.section {
     margin: 30px 0 8px;
-    color: #1f4e78;
+    color: var(--blue);
     font-size: 1.1rem;
   }
   h2.section.alt { color: #6a4d24; }
@@ -34,7 +117,7 @@
     width: 100%;
     border-collapse: collapse;
     background: #fff;
-    border: 1px solid #d9e0ea;
+    border: 1px solid var(--border);
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 1px 3px rgba(0,0,0,0.04);
@@ -47,17 +130,17 @@
     font-size: 0.96rem;
   }
   th {
-    background: #1f4e78;
+    background: var(--blue);
     color: #fff;
     font-weight: 600;
     white-space: nowrap;
   }
-  table.alt th { background: #8d6a2c; }
+  table.alt th { background: var(--gold); }
   tr:last-child td { border-bottom: none; }
   tr:nth-child(even) td { background: #f4f7fb; }
   table.alt tr:nth-child(even) td { background: #fbf6ec; }
   a {
-    color: #1f4e78;
+    color: var(--blue);
     word-break: break-all;
   }
   a:hover { text-decoration: underline; }
@@ -77,6 +160,13 @@
   }
   .pending-note a { color: #b26a00; }
   .pending-item + .pending-item { margin-top: 12px; padding-top: 12px; border-top: 1px dashed #ffd592; }
+  .empty-note {
+    background: #fff;
+    border: 1px dashed #b8c5d6;
+    border-radius: 8px;
+    padding: 16px;
+    color: var(--muted);
+  }
 
   .updated {
     text-align: right;
@@ -110,23 +200,67 @@
     color: #1b5e20;
   }
   .recent-summary strong { color: #137333; }
+
+  @media (max-width: 760px) {
+    body { padding: 22px 12px; }
+    .tab-label { flex: 1 1 100%; justify-content: space-between; }
+    table, thead, tbody, tr, th, td { display: block; }
+    thead { display: none; }
+    tr { border-bottom: 1px solid #d9e0ea; }
+    td { border-bottom: none; }
+    td::before {
+      content: attr(data-label);
+      display: block;
+      font-weight: 700;
+      color: var(--blue);
+      margin-bottom: 2px;
+    }
+  }
 </style>
 </head>
 <body>
 <div class="wrap">
 
-  <h1>Anne 2026 暑期管樂團／管樂營 (北北桃)</h1>
-  <div class="sub">適合國小高年級 · 有確認活動日期與報名日期 · 報名尚未截止</div>
+  <h1>Anne 2026 夏令營搜尋清單</h1>
+  <div class="sub">依主題分頁整理搜尋結果；音樂／管樂維持預設頁籤，另新增戲劇表演／音樂劇頁籤。</div>
 
   
-  <div class="recent-summary">
-    <strong>最近 7 天有變動:</strong>
-    陽光台北交響樂團 (陽光台北文教學會) · 臺北市立弘道國民中學 · 桃園市立大有國民中學 · 衛武營國家藝術文化中心「2026 衛武營音樂營 & 歐洲銅管之聲」(銅管、打擊組) · 台北青年管樂團「2026 陽光管樂夏令營 (第 18 屆)」 · 台中市青少年交響樂團 2026 國際音樂夏令營
+  <input class="tab-input" type="radio" name="topic-tabs" id="tab-music" checked>
+  
+  <input class="tab-input" type="radio" name="topic-tabs" id="tab-performing-arts">
+  
+
+  <div class="tabs" role="tablist" aria-label="夏令營主題">
+    
+    <label class="tab-label" for="tab-music" role="tab">
+      <span>音樂／管樂</span>
+      <span class="tab-count">6</span>
+    </label>
+    
+    <label class="tab-label" for="tab-performing-arts" role="tab">
+      <span>戲劇表演／音樂劇</span>
+      <span class="tab-count">4</span>
+    </label>
+    
   </div>
-  
 
-  <h2 class="section">符合條件 (北北桃)</h2>
-  <table>
+  
+  <section class="tab-panel panel-music" aria-labelledby="tab-music">
+    <div class="topic-heading">
+      <h2>Anne 2026 暑期管樂團／管樂營 (北北桃)</h2>
+      <p>適合國小高年級 · 有確認活動日期與報名日期 · 報名尚未截止</p>
+    </div>
+
+    
+    <div class="recent-summary">
+      <strong>最近 7 天有變動:</strong>
+      陽光台北交響樂團 (陽光台北文教學會) · 臺北市立弘道國民中學 · 桃園市立大有國民中學 · 衛武營國家藝術文化中心「2026 衛武營音樂營 & 歐洲銅管之聲」(銅管、打擊組) · 台北青年管樂團「2026 陽光管樂夏令營 (第 18 屆)」 · 台中市青少年交響樂團 2026 國際音樂夏令營
+    </div>
+    
+
+    
+    <h2 class="section">符合條件 (北北桃)</h2>
+    <table>
     <thead>
       <tr>
         <th>舉辦單位</th>
@@ -138,47 +272,48 @@
     <tbody>
       
       <tr class="row-recent">
-        <td>陽光台北交響樂團 (陽光台北文教學會)<span class="badge new">新增</span></td>
-        <td>陽光台北交響樂團 (台北市大安區南昌路二段 158 號 B1)<br>台北和平教會 (台北市大安區和平東路一段 183 巷 9 號)<br>新莊文化藝術中心 (成果音樂會)</td>
-        <td>
+        <td data-label="舉辦單位">陽光台北交響樂團 (陽光台北文教學會)<span class="badge new">新增</span></td>
+        <td data-label="地點">陽光台北交響樂團 (台北市大安區南昌路二段 158 號 B1)<br>台北和平教會 (台北市大安區和平東路一段 183 巷 9 號)<br>新莊文化藝術中心 (成果音樂會)</td>
+        <td data-label="日期">
           活動:2026/7/5 – 2026/7/9 每日 10:00–17:50;<br>成果展演:2026/7/10 14:00–17:00 彩排、19:30 演出<br>
           報名:即日起至 2026/7/1 (早鳥 5/30 前)
         </td>
-        <td>
+        <td data-label="報名網頁">
           <a href="https://www.suntaipeiphil.org/%E6%9A%91%E6%9C%9F%E9%9F%B3%E6%A8%82%E7%87%9F" target="_blank" rel="noopener">公告頁</a><br><a href="https://docs.google.com/forms/d/e/1FAIpQLScQTwVOt1ljSEgAxULghb85siF1uEiluK9UvXc7yTq-sfGouQ/viewform?usp=header" target="_blank" rel="noopener">Google 報名表單</a><br><a href="https://www.suntaipeiphil.org/_files/ugd/42c010_e88c3436935545a484c7c96765f2d541.pdf" target="_blank" rel="noopener">報名簡章 (PDF)</a>
         </td>
       </tr>
       
       <tr class="row-recent">
-        <td>臺北市立弘道國民中學<span class="badge new">新增</span></td>
-        <td>臺北市中正區公園路 21 號 (臺北市立弘道國民中學)</td>
-        <td>
+        <td data-label="舉辦單位">臺北市立弘道國民中學<span class="badge new">新增</span></td>
+        <td data-label="地點">臺北市中正區公園路 21 號 (臺北市立弘道國民中學)</td>
+        <td data-label="日期">
           活動:2026/8/10 – 2026/8/12 13:00–17:00<br>
           報名:即日起至 2026/7/25 16:30
         </td>
-        <td>
+        <td data-label="報名網頁">
           <a href="https://www.htjh.tp.edu.tw/news/%e6%9c%ac%e6%a0%a1115%e5%b9%b4%e5%ba%a6%e6%9a%91%e6%9c%9f%e7%ae%a1%e6%a8%82%e8%82%b2%e6%a8%82%e7%87%9f%e9%96%8b%e5%a7%8b%e5%a0%b1%e5%90%8d/" target="_blank" rel="noopener">公告頁</a><br><a href="https://lin.ee/znBkzJf" target="_blank" rel="noopener">LINE 報名</a>
         </td>
       </tr>
       
       <tr class="row-recent">
-        <td>桃園市立大有國民中學<span class="badge new">新增</span></td>
-        <td>桃園市立大有國民中學音樂教室 (一)</td>
-        <td>
+        <td data-label="舉辦單位">桃園市立大有國民中學<span class="badge new">新增</span></td>
+        <td data-label="地點">桃園市立大有國民中學音樂教室 (一)</td>
+        <td data-label="日期">
           活動:2026/8/17 – 2026/8/21 13:00–15:00<br>
           報名:即日起至 2026/6/30
         </td>
-        <td>
+        <td data-label="報名網頁">
           <a href="https://www.dyjhs.tyc.edu.tw/modules/tadnews/index.php?ncsn=10&nsn=9573" target="_blank" rel="noopener">公告頁 (含紙本報名表)</a>
         </td>
       </tr>
       
     </tbody>
   </table>
+    
 
-  
-  <h2 class="section alt">其他條件符合,但地區不在北北桃 (參考)</h2>
-  <table class="alt">
+    
+    <h2 class="section alt">其他條件符合,但地區不在北北桃 (參考)</h2>
+    <table class="alt">
     <thead>
       <tr>
         <th>舉辦單位</th>
@@ -190,41 +325,129 @@
     <tbody>
       
       <tr class="row-recent">
-        <td>衛武營國家藝術文化中心「2026 衛武營音樂營 & 歐洲銅管之聲」(銅管、打擊組)<span class="badge new">新增</span></td>
-        <td>衛武營國家藝術文化中心 (高雄市鳳山區)</td>
-        <td>
+        <td data-label="舉辦單位">衛武營國家藝術文化中心「2026 衛武營音樂營 & 歐洲銅管之聲」(銅管、打擊組)<span class="badge new">新增</span></td>
+        <td data-label="地點">衛武營國家藝術文化中心 (高雄市鳳山區)</td>
+        <td data-label="日期">
           活動:2026/7/6 – 2026/7/12<br>
           報名:即日起至 2026/4/30 (早鳥 3/1 前)
         </td>
-        <td>
+        <td data-label="報名網頁">
           <a href="https://www.npac-weiwuying.org/programs/68f73adaaf274c000ad0ffa7" target="_blank" rel="noopener">衛武營官網節目頁</a>
         </td>
       </tr>
       
     </tbody>
   </table>
-  
-
-  
-  <h2 class="pending">待查 (主辦單位已宣告 2026 開放報名,但搜尋尚未取得確切日期)</h2>
-  <div class="pending-note">
     
-    <div class="pending-item">
-      <strong>台北青年管樂團「2026 陽光管樂夏令營 (第 18 屆)」</strong><span class="badge new">新增</span> (地區:北部,可能在新北平溪)<br>
-      主辦單位:台北青年管樂團 (TSB)。FB 已公告 2026 第 18 屆開始報名,惟具體活動日期與報名截止日尚未由文字資料確認。<br>
-      <a href="https://www.tsb.org.tw/" target="_blank" rel="noopener">官網</a> ‧ <a href="https://www.tsb.org.tw/%E6%B4%BB%E5%8B%95%E8%B3%87%E8%A8%8A/" target="_blank" rel="noopener">活動頁</a>
+
+    
+    <h2 class="pending">待查 (主辦單位已宣告 2026 開放報名,但搜尋尚未取得確切日期)</h2>
+    <div class="pending-note">
+      
+      <div class="pending-item">
+        <strong>台北青年管樂團「2026 陽光管樂夏令營 (第 18 屆)」</strong><span class="badge new">新增</span> (地區:北部,可能在新北平溪)<br>
+        主辦單位:台北青年管樂團 (TSB)。FB 已公告 2026 第 18 屆開始報名,惟具體活動日期與報名截止日尚未由文字資料確認。<br>
+        <a href="https://www.tsb.org.tw/" target="_blank" rel="noopener">官網</a> ‧ <a href="https://www.tsb.org.tw/%E6%B4%BB%E5%8B%95%E8%B3%87%E8%A8%8A/" target="_blank" rel="noopener">活動頁</a>
+      </div>
+      
+      <div class="pending-item">
+        <strong>台中市青少年交響樂團 2026 國際音樂夏令營</strong><span class="badge new">新增</span> (地區:中部,僅供參考)<br>
+        官網音樂營頁有 2026 報名表 (圖片),早鳥優惠至 4/30,但搜尋尚未取得具體活動日期與最終報名截止日。<br>
+        <a href="https://tcyso.com/news/" target="_blank" rel="noopener">最新消息</a> ‧ <a href="https://tcyso.com/about/performance-festival/music-festival/" target="_blank" rel="noopener">tcyso.com 音樂營</a>
+      </div>
+      
     </div>
     
-    <div class="pending-item">
-      <strong>台中市青少年交響樂團 2026 國際音樂夏令營</strong><span class="badge new">新增</span> (地區:中部,僅供參考)<br>
-      官網音樂營頁有 2026 報名表 (圖片),早鳥優惠至 4/30,但搜尋尚未取得具體活動日期與最終報名截止日。<br>
-      <a href="https://tcyso.com/news/" target="_blank" rel="noopener">最新消息</a> ‧ <a href="https://tcyso.com/about/performance-festival/music-festival/" target="_blank" rel="noopener">tcyso.com 音樂營</a>
+
+    
+  </section>
+  
+  <section class="tab-panel panel-performing-arts" aria-labelledby="tab-performing-arts">
+    <div class="topic-heading">
+      <h2>2026 戲劇表演／音樂劇夏令營搜尋結果</h2>
+      <p>收納「戲劇表演」與「音樂劇」相關夏令營，欄位沿用舉辦單位、地點、日期、報名網頁，方便和音樂營隊並列比較。</p>
+    </div>
+
+    
+    <div class="recent-summary">
+      <strong>最近 7 天有變動:</strong>
+      臺北表演藝術中心「2026 青少年夏日瘋劇場 — 音樂劇營《跟著阿嬤去旅行》」 · 橙智國際教育集團「2026 橘子泥歌舞劇營」(台北) · 愛樂劇工廠 2026 藝術教育夏令營 · 華視訓練中心 2026 兒童表演類夏令營
     </div>
     
-  </div>
+
+    
+    <h2 class="section">搜尋結果 (北北桃)</h2>
+    <table>
+    <thead>
+      <tr>
+        <th>舉辦單位</th>
+        <th>地點</th>
+        <th>日期</th>
+        <th>報名網頁</th>
+      </tr>
+    </thead>
+    <tbody>
+      
+      <tr class="row-recent">
+        <td data-label="舉辦單位">臺北表演藝術中心「2026 青少年夏日瘋劇場 — 音樂劇營《跟著阿嬤去旅行》」<span class="badge new">新增</span></td>
+        <td data-label="地點">臺北表演藝術中心 11F 排練室 1、2 (臺北市士林區劍潭路 1 號)</td>
+        <td data-label="日期">
+          活動:2026/7/13 – 2026/7/25 每日 09:00–17:00 (第一梯);<br>活動:2026/7/27 – 2026/8/8 每日 09:00–17:00 (第二梯; 8/2 休息)<br>
+          報名:2026/5/11 12:00 至 2026/6/14 23:59
+        </td>
+        <td data-label="報名網頁">
+          <a href="https://tpac.org.taipei/event/1835" target="_blank" rel="noopener">活動頁</a><br><a href="https://www.surveycake.com/s/lpZMr" target="_blank" rel="noopener">報名表</a><br><a href="https://www.bjes.tp.edu.tw/news/get/2281" target="_blank" rel="noopener">學校轉知公告</a>
+        </td>
+      </tr>
+      
+      <tr class="row-recent">
+        <td data-label="舉辦單位">橙智國際教育集團「2026 橘子泥歌舞劇營」(台北)<span class="badge new">新增</span></td>
+        <td data-label="地點">橙智台北教育中心 (台北市信義區基隆路二段 51 號 14 樓，近台北 101 / 世貿捷運站)</td>
+        <td data-label="日期">
+          活動:2026/7/13 – 2026/7/17 09:00–18:00 (第一梯);<br>活動:2026/7/27 – 2026/7/31 09:00–18:00 (第二梯);<br>活動:2026/8/3 – 2026/8/7 09:00–18:00 (第三梯)<br>
+          報名:線上報名開放中; 早鳥優惠至 2026/5/31，頁面未列統一截止日，依額滿或各梯開課前受理狀態為準
+        </td>
+        <td data-label="報名網頁">
+          <a href="https://www.smartorange.com.tw/summer-camp/2026sc_musical/" target="_blank" rel="noopener">活動與報名資訊頁</a>
+        </td>
+      </tr>
+      
+      <tr class="row-recent">
+        <td data-label="舉辦單位">愛樂劇工廠 2026 藝術教育夏令營<span class="badge new">新增</span></td>
+        <td data-label="地點">渴望會館 (桃園市龍潭區渴望路 428 號)</td>
+        <td data-label="日期">
+          活動:2026/8/9 16:30 – 2026/8/15 14:50<br>
+          報名:Accupass 開放報名中; 早鳥優惠至 2026/6/30
+        </td>
+        <td data-label="報名網頁">
+          <a href="https://www.accupass.com/event/2604220836091327294189" target="_blank" rel="noopener">Accupass 活動頁</a><br><a href="https://ticf23.my.canva.site/" target="_blank" rel="noopener">完整營隊課程資料簡章</a>
+        </td>
+      </tr>
+      
+    </tbody>
+  </table>
+    
+
+    
+
+    
+    <h2 class="pending">待查 / 後續搜尋追蹤</h2>
+    <div class="pending-note">
+      
+      <div class="pending-item">
+        <strong>華視訓練中心 2026 兒童表演類夏令營</strong><span class="badge new">新增</span> (地區: 台北; 類型: 戲劇表演 / 小小演員 / 英語戲劇等)<br>
+        已找到 2026 暑期營隊總頁與「小小表演班」課程說明，但待確認各班可報名梯次、確切活動日期與是否仍有名額。<br>
+        <a href="https://www.ccef.org.tw/ccefkidswcamp15/" target="_blank" rel="noopener">小小表演班頁</a>
+      </div>
+      
+    </div>
+    
+
+    
+  </section>
   
 
-  <div class="updated">最後更新:2026-05-16</div>
+  <div class="updated">最後更新:2026-05-15</div>
 
 </div>
 </body>

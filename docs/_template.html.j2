@@ -2,31 +2,129 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8">
-<title>Anne 2026 暑期管樂團／管樂營 (北北桃)</title>
+<title>Anne 2026 夏令營搜尋清單</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% macro camp_table(entries, is_alt=false) -%}
+  <table{% if is_alt %} class="alt"{% endif %}>
+    <thead>
+      <tr>
+        <th>舉辦單位</th>
+        <th>地點</th>
+        <th>日期</th>
+        <th>報名網頁</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for e in entries %}
+      <tr class="{{ row_class(e) }}">
+        <td data-label="舉辦單位">{{ e.organizer }}{{ badge(e) | safe }}</td>
+        <td data-label="地點">{{ e.location_lines | join('<br>') | safe }}</td>
+        <td data-label="日期">
+          {% for line in e.activity_lines %}{{ line }}{% if not loop.last %};<br>{% endif %}{% endfor %}<br>
+          {{ e.registration_line }}
+        </td>
+        <td data-label="報名網頁">
+          {% for link in e.links %}<a href="{{ link.url }}" target="_blank" rel="noopener">{{ link.label }}</a>{% if not loop.last %}<br>{% endif %}{% endfor %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{%- endmacro %}
 <style>
+  :root {
+    --blue: #1f4e78;
+    --blue-dark: #173b5b;
+    --gold: #8d6a2c;
+    --bg: #f7f8fa;
+    --border: #d9e0ea;
+    --text: #1a2330;
+    --muted: #5c6b80;
+  }
   body {
     font-family: "Noto Sans TC", "Microsoft JhengHei", "PingFang TC", sans-serif;
     margin: 0;
     padding: 32px 20px;
-    background: #f7f8fa;
-    color: #1a2330;
+    background: var(--bg);
+    color: var(--text);
     line-height: 1.65;
   }
-  .wrap { max-width: 1000px; margin: 0 auto; }
+  .wrap { max-width: 1080px; margin: 0 auto; }
   h1 {
-    font-size: 1.4rem;
-    color: #1f4e78;
+    font-size: 1.45rem;
+    color: var(--blue);
     margin: 0 0 4px;
   }
   .sub {
-    color: #5c6b80;
+    color: var(--muted);
     font-size: 0.92rem;
-    margin-bottom: 24px;
+    margin-bottom: 18px;
   }
+  .tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 8px 0 18px;
+  }
+  .tab-input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .tab-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: #fff;
+    color: var(--blue);
+    cursor: pointer;
+    font-weight: 700;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  }
+  .tab-label:hover { border-color: var(--blue); }
+  .tab-count {
+    min-width: 1.4em;
+    padding: 1px 7px;
+    border-radius: 999px;
+    background: #eef3f8;
+    color: var(--muted);
+    font-size: 0.78rem;
+    text-align: center;
+  }
+  .tab-panel { display: none; }
+  {% for topic in topics %}
+  #tab-{{ topic.id }}:checked ~ .tabs label[for="tab-{{ topic.id }}"] {
+    background: {{ topic.accent | default('#1f4e78') }};
+    border-color: {{ topic.accent | default('#1f4e78') }};
+    color: #fff;
+  }
+  #tab-{{ topic.id }}:checked ~ .tabs label[for="tab-{{ topic.id }}"] .tab-count {
+    background: rgba(255,255,255,0.2);
+    color: #fff;
+  }
+  #tab-{{ topic.id }}:checked ~ .panel-{{ topic.id }} { display: block; }
+  {% endfor %}
+  .topic-heading {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 18px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+  .topic-heading h2 {
+    margin: 0 0 4px;
+    color: var(--blue);
+    font-size: 1.2rem;
+  }
+  .topic-heading p { margin: 0; color: var(--muted); font-size: 0.94rem; }
   h2.section {
     margin: 30px 0 8px;
-    color: #1f4e78;
+    color: var(--blue);
     font-size: 1.1rem;
   }
   h2.section.alt { color: #6a4d24; }
@@ -34,7 +132,7 @@
     width: 100%;
     border-collapse: collapse;
     background: #fff;
-    border: 1px solid #d9e0ea;
+    border: 1px solid var(--border);
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 1px 3px rgba(0,0,0,0.04);
@@ -47,17 +145,17 @@
     font-size: 0.96rem;
   }
   th {
-    background: #1f4e78;
+    background: var(--blue);
     color: #fff;
     font-weight: 600;
     white-space: nowrap;
   }
-  table.alt th { background: #8d6a2c; }
+  table.alt th { background: var(--gold); }
   tr:last-child td { border-bottom: none; }
   tr:nth-child(even) td { background: #f4f7fb; }
   table.alt tr:nth-child(even) td { background: #fbf6ec; }
   a {
-    color: #1f4e78;
+    color: var(--blue);
     word-break: break-all;
   }
   a:hover { text-decoration: underline; }
@@ -77,6 +175,13 @@
   }
   .pending-note a { color: #b26a00; }
   .pending-item + .pending-item { margin-top: 12px; padding-top: 12px; border-top: 1px dashed #ffd592; }
+  .empty-note {
+    background: #fff;
+    border: 1px dashed #b8c5d6;
+    border-radius: 8px;
+    padding: 16px;
+    color: var(--muted);
+  }
 
   .updated {
     text-align: right;
@@ -110,89 +215,85 @@
     color: #1b5e20;
   }
   .recent-summary strong { color: #137333; }
+
+  @media (max-width: 760px) {
+    body { padding: 22px 12px; }
+    .tab-label { flex: 1 1 100%; justify-content: space-between; }
+    table, thead, tbody, tr, th, td { display: block; }
+    thead { display: none; }
+    tr { border-bottom: 1px solid #d9e0ea; }
+    td { border-bottom: none; }
+    td::before {
+      content: attr(data-label);
+      display: block;
+      font-weight: 700;
+      color: var(--blue);
+      margin-bottom: 2px;
+    }
+  }
 </style>
 </head>
 <body>
 <div class="wrap">
 
-  <h1>Anne 2026 暑期管樂團／管樂營 (北北桃)</h1>
-  <div class="sub">適合國小高年級 · 有確認活動日期與報名日期 · 報名尚未截止</div>
+  <h1>Anne 2026 夏令營搜尋清單</h1>
+  <div class="sub">依主題分頁整理搜尋結果；音樂／管樂維持預設頁籤，另新增戲劇表演／音樂劇頁籤。</div>
 
-  {% if recent_changes %}
-  <div class="recent-summary">
-    <strong>最近 7 天有變動:</strong>
-    {% for r in recent_changes %}{{ r.organizer or r.title }}{% if not loop.last %} · {% endif %}{% endfor %}
-  </div>
-  {% endif %}
+  {% for topic in topics %}
+  <input class="tab-input" type="radio" name="topic-tabs" id="tab-{{ topic.id }}"{% if loop.first %} checked{% endif %}>
+  {% endfor %}
 
-  <h2 class="section">符合條件 (北北桃)</h2>
-  <table>
-    <thead>
-      <tr>
-        <th>舉辦單位</th>
-        <th>地點</th>
-        <th>日期</th>
-        <th>報名網頁</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for e in included_north %}
-      <tr class="{{ row_class(e) }}">
-        <td>{{ e.organizer }}{{ badge(e) | safe }}</td>
-        <td>{{ e.location_lines | join('<br>') | safe }}</td>
-        <td>
-          {% for line in e.activity_lines %}{{ line }}{% if not loop.last %};<br>{% endif %}{% endfor %}<br>
-          {{ e.registration_line }}
-        </td>
-        <td>
-          {% for link in e.links %}<a href="{{ link.url }}" target="_blank" rel="noopener">{{ link.label }}</a>{% if not loop.last %}<br>{% endif %}{% endfor %}
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-
-  {% if included_other %}
-  <h2 class="section alt">其他條件符合,但地區不在北北桃 (參考)</h2>
-  <table class="alt">
-    <thead>
-      <tr>
-        <th>舉辦單位</th>
-        <th>地點</th>
-        <th>日期</th>
-        <th>報名網頁</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for e in included_other %}
-      <tr class="{{ row_class(e) }}">
-        <td>{{ e.organizer }}{{ badge(e) | safe }}</td>
-        <td>{{ e.location_lines | join('<br>') | safe }}</td>
-        <td>
-          {% for line in e.activity_lines %}{{ line }}{% if not loop.last %};<br>{% endif %}{% endfor %}<br>
-          {{ e.registration_line }}
-        </td>
-        <td>
-          {% for link in e.links %}<a href="{{ link.url }}" target="_blank" rel="noopener">{{ link.label }}</a>{% if not loop.last %}<br>{% endif %}{% endfor %}
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-  {% endif %}
-
-  {% if pending %}
-  <h2 class="pending">待查 (主辦單位已宣告 2026 開放報名,但搜尋尚未取得確切日期)</h2>
-  <div class="pending-note">
-    {% for p in pending %}
-    <div class="pending-item">
-      <strong>{{ p.title }}</strong>{{ badge(p) | safe }} ({{ p.region_note }})<br>
-      {% for line in p.body_lines %}{{ line }}<br>{% endfor %}
-      {% for link in p.links %}<a href="{{ link.url }}" target="_blank" rel="noopener">{{ link.label }}</a>{% if not loop.last %} ‧ {% endif %}{% endfor %}
-    </div>
+  <div class="tabs" role="tablist" aria-label="夏令營主題">
+    {% for topic in topics %}
+    <label class="tab-label" for="tab-{{ topic.id }}" role="tab">
+      <span>{{ topic.label }}</span>
+      <span class="tab-count">{{ topic.total_count }}</span>
+    </label>
     {% endfor %}
   </div>
-  {% endif %}
+
+  {% for topic in topics %}
+  <section class="tab-panel panel-{{ topic.id }}" aria-labelledby="tab-{{ topic.id }}">
+    <div class="topic-heading">
+      <h2>{{ topic.title }}</h2>
+      <p>{{ topic.subtitle }}</p>
+    </div>
+
+    {% if topic.recent_changes %}
+    <div class="recent-summary">
+      <strong>最近 7 天有變動:</strong>
+      {% for r in topic.recent_changes %}{{ r.organizer or r.title }}{% if not loop.last %} · {% endif %}{% endfor %}
+    </div>
+    {% endif %}
+
+    {% if topic.included_north %}
+    <h2 class="section">{{ topic.north_heading }}</h2>
+    {{ camp_table(topic.included_north, false) }}
+    {% endif %}
+
+    {% if topic.included_other %}
+    <h2 class="section alt">{{ topic.other_heading }}</h2>
+    {{ camp_table(topic.included_other, true) }}
+    {% endif %}
+
+    {% if topic.pending %}
+    <h2 class="pending">{{ topic.pending_heading }}</h2>
+    <div class="pending-note">
+      {% for p in topic.pending %}
+      <div class="pending-item">
+        <strong>{{ p.title }}</strong>{{ badge(p) | safe }}{% if p.region_note %} ({{ p.region_note }}){% endif %}<br>
+        {% for line in p.body_lines %}{{ line }}<br>{% endfor %}
+        {% for link in p.links %}<a href="{{ link.url }}" target="_blank" rel="noopener">{{ link.label }}</a>{% if not loop.last %} ‧ {% endif %}{% endfor %}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if not topic.included_north and not topic.included_other and not topic.pending %}
+    <div class="empty-note">{{ topic.empty_message }}</div>
+    {% endif %}
+  </section>
+  {% endfor %}
 
   <div class="updated">最後更新:{{ last_updated }}</div>
 

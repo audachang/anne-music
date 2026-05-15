@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-05-16",
+  "last_updated": "2026-05-15",
   "included_north": [
     {
       "id": "suntaipei-2026-summer",
@@ -16,9 +16,18 @@
       "registration_line": "報名:即日起至 2026/7/1 (早鳥 5/30 前)",
       "deadline_iso": "2026-07-01",
       "links": [
-        {"label": "公告頁", "url": "https://www.suntaipeiphil.org/%E6%9A%91%E6%9C%9F%E9%9F%B3%E6%A8%82%E7%87%9F"},
-        {"label": "Google 報名表單", "url": "https://docs.google.com/forms/d/e/1FAIpQLScQTwVOt1ljSEgAxULghb85siF1uEiluK9UvXc7yTq-sfGouQ/viewform?usp=header"},
-        {"label": "報名簡章 (PDF)", "url": "https://www.suntaipeiphil.org/_files/ugd/42c010_e88c3436935545a484c7c96765f2d541.pdf"}
+        {
+          "label": "公告頁",
+          "url": "https://www.suntaipeiphil.org/%E6%9A%91%E6%9C%9F%E9%9F%B3%E6%A8%82%E7%87%9F"
+        },
+        {
+          "label": "Google 報名表單",
+          "url": "https://docs.google.com/forms/d/e/1FAIpQLScQTwVOt1ljSEgAxULghb85siF1uEiluK9UvXc7yTq-sfGouQ/viewform?usp=header"
+        },
+        {
+          "label": "報名簡章 (PDF)",
+          "url": "https://www.suntaipeiphil.org/_files/ugd/42c010_e88c3436935545a484c7c96765f2d541.pdf"
+        }
       ],
       "first_seen": "2026-05-16",
       "last_changed": "2026-05-16",
@@ -36,8 +45,14 @@
       "registration_line": "報名:即日起至 2026/7/25 16:30",
       "deadline_iso": "2026-07-25",
       "links": [
-        {"label": "公告頁", "url": "https://www.htjh.tp.edu.tw/news/%e6%9c%ac%e6%a0%a1115%e5%b9%b4%e5%ba%a6%e6%9a%91%e6%9c%9f%e7%ae%a1%e6%a8%82%e8%82%b2%e6%a8%82%e7%87%9f%e9%96%8b%e5%a7%8b%e5%a0%b1%e5%90%8d/"},
-        {"label": "LINE 報名", "url": "https://lin.ee/znBkzJf"}
+        {
+          "label": "公告頁",
+          "url": "https://www.htjh.tp.edu.tw/news/%e6%9c%ac%e6%a0%a1115%e5%b9%b4%e5%ba%a6%e6%9a%91%e6%9c%9f%e7%ae%a1%e6%a8%82%e8%82%b2%e6%a8%82%e7%87%9f%e9%96%8b%e5%a7%8b%e5%a0%b1%e5%90%8d/"
+        },
+        {
+          "label": "LINE 報名",
+          "url": "https://lin.ee/znBkzJf"
+        }
       ],
       "first_seen": "2026-05-16",
       "last_changed": "2026-05-16",
@@ -55,7 +70,10 @@
       "registration_line": "報名:即日起至 2026/6/30",
       "deadline_iso": "2026-06-30",
       "links": [
-        {"label": "公告頁 (含紙本報名表)", "url": "https://www.dyjhs.tyc.edu.tw/modules/tadnews/index.php?ncsn=10&nsn=9573"}
+        {
+          "label": "公告頁 (含紙本報名表)",
+          "url": "https://www.dyjhs.tyc.edu.tw/modules/tadnews/index.php?ncsn=10&nsn=9573"
+        }
       ],
       "first_seen": "2026-05-16",
       "last_changed": "2026-05-16",
@@ -75,7 +93,10 @@
       "registration_line": "報名:即日起至 2026/4/30 (早鳥 3/1 前)",
       "deadline_iso": "2026-04-30",
       "links": [
-        {"label": "衛武營官網節目頁", "url": "https://www.npac-weiwuying.org/programs/68f73adaaf274c000ad0ffa7"}
+        {
+          "label": "衛武營官網節目頁",
+          "url": "https://www.npac-weiwuying.org/programs/68f73adaaf274c000ad0ffa7"
+        }
       ],
       "first_seen": "2026-05-16",
       "last_changed": "2026-05-16",
@@ -91,8 +112,14 @@
         "主辦單位:台北青年管樂團 (TSB)。FB 已公告 2026 第 18 屆開始報名,惟具體活動日期與報名截止日尚未由文字資料確認。"
       ],
       "links": [
-        {"label": "官網", "url": "https://www.tsb.org.tw/"},
-        {"label": "活動頁", "url": "https://www.tsb.org.tw/%E6%B4%BB%E5%8B%95%E8%B3%87%E8%A8%8A/"}
+        {
+          "label": "官網",
+          "url": "https://www.tsb.org.tw/"
+        },
+        {
+          "label": "活動頁",
+          "url": "https://www.tsb.org.tw/%E6%B4%BB%E5%8B%95%E8%B3%87%E8%A8%8A/"
+        }
       ],
       "first_seen": "2026-05-16",
       "last_changed": "2026-05-16"
@@ -105,40 +132,332 @@
         "官網音樂營頁有 2026 報名表 (圖片),早鳥優惠至 4/30,但搜尋尚未取得具體活動日期與最終報名截止日。"
       ],
       "links": [
-        {"label": "最新消息", "url": "https://tcyso.com/news/"},
-        {"label": "tcyso.com 音樂營", "url": "https://tcyso.com/about/performance-festival/music-festival/"}
+        {
+          "label": "最新消息",
+          "url": "https://tcyso.com/news/"
+        },
+        {
+          "label": "tcyso.com 音樂營",
+          "url": "https://tcyso.com/about/performance-festival/music-festival/"
+        }
       ],
       "first_seen": "2026-05-16",
       "last_changed": "2026-05-16"
     }
   ],
   "excluded": [
-    {"organizer": "台北愛樂少年管樂團", "url": "https://www.tpf.org.tw/zh-hant/family/700", "reason": "僅樂團介紹與指揮資訊,無 2026 暑期音樂營公告", "category": "no_2026_camp", "last_checked": "2026-05-16"},
-    {"organizer": "台北愛樂少年樂團", "url": "https://www.tpf.org.tw/zh-hant/family/120", "reason": "常態團員招收,非暑期營", "category": "no_2026_camp", "last_checked": "2026-05-16"},
-    {"organizer": "台北愛樂青年管弦樂團", "url": "https://www.tpf.org.tw/zh-hant/family/119", "reason": "常態團員招生", "category": "no_2026_camp", "last_checked": "2026-05-16"},
-    {"organizer": "台北愛樂少年弦樂團", "url": "https://www.tpf.org.tw/zh-hant/family/423", "reason": "常態團員招生", "category": "no_2026_camp", "last_checked": "2026-05-16"},
-    {"organizer": "台北市民管樂團 TCSB", "url": "http://tcsb.tw/", "reason": "僅為常態團員招募,非暑期營隊", "category": "no_2026_camp", "last_checked": "2026-05-16"},
-    {"organizer": "好聲樂集 SGYSO", "url": "https://www.soundsgoods.org/sgyso", "reason": "常態團員招生,弦樂為主", "category": "no_2026_camp", "last_checked": "2026-05-16"},
-    {"organizer": "愛樂種子 Sistema Taiwan", "url": "https://sistema-taiwan.webnode.tw/", "reason": "提琴公益計畫,長期教學,無暑期音樂營", "category": "no_2026_camp", "last_checked": "2026-05-16"},
-    {"organizer": "樂興之時管絃樂團", "url": "https://momentmusical.weebly.com/", "reason": "演出團體,無暑期營隊", "category": "no_2026_camp", "last_checked": "2026-05-16"},
-    {"organizer": "2026 NTSO 國際青少年管弦樂營", "url": "", "reason": "甄選 2026/2/10 截止,錄取已公告;單簧管亦需具相當演奏經驗", "category": "out_of_scope_or_closed", "last_checked": "2026-05-16"},
-    {"organizer": "新北市青少年管弦樂團 (榮富國小集訓)", "url": "", "reason": "通過甄選始能加入,要求一定演奏水準", "category": "out_of_scope_or_closed", "last_checked": "2026-05-16"},
-    {"organizer": "SMIMC 國際兒童音樂營 (台北場)", "url": "", "reason": "全英文 + 國際師資、強度高,適合中階以上,且未取得 2026 確切日期", "category": "out_of_scope_or_closed", "last_checked": "2026-05-16"},
-    {"organizer": "新埔國小管樂團、大成國小管樂團", "url": "", "reason": "以本校校隊為主", "category": "out_of_scope_or_closed", "last_checked": "2026-05-16"},
-    {"organizer": "第 25 屆政大管樂營《風與影的通道》", "url": "", "reason": "2026/7/13–7/19,報名至 2026/4/30 已截止;對象為具管樂基礎合奏能力之應屆小六至高中職畢業生", "category": "out_of_scope_or_closed", "last_checked": "2026-05-16"},
-    {"organizer": "桃園長老教會 2026 暑期音樂營", "url": "", "reason": "課程為合唱、小提琴、大提琴、古典吉他等,未見管樂主軸", "category": "no_winds_focus", "last_checked": "2026-05-16"},
-    {"organizer": "2026 桃園管樂嘉年華室內樂大師班", "url": "", "reason": "日期在 6 月初,且需要團體演奏能力與影片", "category": "no_winds_focus", "last_checked": "2026-05-16"},
-    {"organizer": "2026 嘉義市國際管樂節", "url": "", "reason": "多為踩街、戶外音樂會;管樂節主體於 12 月底至 1 月初,非暑期", "category": "no_winds_focus", "last_checked": "2026-05-16"},
-    {"organizer": "臺北市 115 年度國民小學暑期體驗學習營", "url": "https://holiday.tp.edu.tw/", "reason": "簡章中未見管樂團/管樂營項目;入口性質,定期重查", "category": "portal_recheck", "last_checked": "2026-05-16"},
-    {"organizer": "新北市中小學寒暑期育樂營", "url": "https://camp.ntpc.edu.tw/", "reason": "5/19 中午 12:00 開放報名;入口性質,目前簡章中未見管樂團/管樂營主軸項目;定期重查", "category": "portal_recheck", "last_checked": "2026-05-16"},
-    {"organizer": "桃園市政府教育局 2026 暑期活動", "url": "", "reason": "公告 60+ 項暑期活動,未見管樂團/管樂營主軸項目;入口性質,定期重查", "category": "portal_recheck", "last_checked": "2026-05-16"},
-    {"organizer": "新莊國中、永和國中、福營國中、中和國小、新埔國小、大成國小等學校管樂團頁面", "url": "", "reason": "僅為團隊介紹或學期招生,未公告 2026 暑期具體活動與報名日期", "category": "no_dates", "last_checked": "2026-05-16"},
-    {"organizer": "桃園市立中興國中", "url": "", "reason": "提及 115 學年度管樂團招生,未公告暑期具體活動日期", "category": "no_dates", "last_checked": "2026-05-16"},
-    {"organizer": "新莊國中 115 學年度管樂團招生", "url": "", "reason": "有 Google 表單,但頁面未提供明確暑期活動日期與報名截止日", "category": "no_dates", "last_checked": "2026-05-16"},
-    {"organizer": "臺北市 114 年度國中階段暑期營隊彙整表", "url": "", "reason": "年份為 2025/114 年,不能放入 2026 清單", "category": "wrong_year", "last_checked": "2026-05-16"},
-    {"organizer": "台北流行音樂中心『北流歡樂島』樂器探索", "url": "", "reason": "兒童節 4 月活動,非暑期", "category": "no_winds_focus", "last_checked": "2026-05-16"},
-    {"organizer": "賦格音樂「兒童交響樂體驗」", "url": "", "reason": "體驗型,無管樂團主軸與固定日期", "category": "no_winds_focus", "last_checked": "2026-05-16"},
-    {"organizer": "NSYO 國家青年交響樂團", "url": "", "reason": "高齡層 (高中以上)、需甄選", "category": "out_of_scope_or_closed", "last_checked": "2026-05-16"},
-    {"organizer": "大墩陽光兒童夏夏令營", "url": "", "reason": "一般綜合性夏令營,無管樂主軸", "category": "no_winds_focus", "last_checked": "2026-05-16"}
+    {
+      "organizer": "台北愛樂少年管樂團",
+      "url": "https://www.tpf.org.tw/zh-hant/family/700",
+      "reason": "僅樂團介紹與指揮資訊,無 2026 暑期音樂營公告",
+      "category": "no_2026_camp",
+      "last_checked": "2026-05-16"
+    },
+    {
+      "organizer": "台北愛樂少年樂團",
+      "url": "https://www.tpf.org.tw/zh-hant/family/120",
+      "reason": "常態團員招收,非暑期營",
+      "category": "no_2026_camp",
+      "last_checked": "2026-05-16"
+    },
+    {
+      "organizer": "台北愛樂青年管弦樂團",
+      "url": "https://www.tpf.org.tw/zh-hant/family/119",
+      "reason": "常態團員招生",
+      "category": "no_2026_camp",
+      "last_checked": "2026-05-16"
+    },
+    {
+      "organizer": "台北愛樂少年弦樂團",
+      "url": "https://www.tpf.org.tw/zh-hant/family/423",
+      "reason": "常態團員招生",
+      "category": "no_2026_camp",
+      "last_checked": "2026-05-16"
+    },
+    {
+      "organizer": "台北市民管樂團 TCSB",
+      "url": "http://tcsb.tw/",
+      "reason": "僅為常態團員招募,非暑期營隊",
+      "category": "no_2026_camp",
+      "last_checked": "2026-05-16"
+    },
+    {
+      "organizer": "好聲樂集 SGYSO",
+      "url": "https://www.soundsgoods.org/sgyso",
+      "reason": "常態團員招生,弦樂為主",
+      "category": "no_2026_camp",
+      "last_checked": "2026-05-16"
+    },
+    {
+      "organizer": "愛樂種子 Sistema Taiwan",
+      "url": "https://sistema-taiwan.webnode.tw/",
+      "reason": "提琴公益計畫,長期教學,無暑期音樂營",
+      "category": "no_2026_camp",
+      "last_checked": "2026-05-16"
+    },
+    {
+      "organizer": "樂興之時管絃樂團",
+      "url": "https://momentmusical.weebly.com/",
+      "reason": "演出團體,無暑期營隊",
+      "category": "no_2026_camp",
+      "last_checked": "2026-05-16"
+    },
+    {
+      "organizer": "2026 NTSO 國際青少年管弦樂營",
+      "url": "",
+      "reason": "甄選 2026/2/10 截止,錄取已公告;單簧管亦需具相當演奏經驗",
+      "category": "out_of_scope_or_closed",
+      "last_checked": "2026-05-16"
+    },
+    {
+      "organizer": "新北市青少年管弦樂團 (榮富國小集訓)",
+      "url": "",
+      "reason": "通過甄選始能加入,要求一定演奏水準",
+      "category": "out_of_scope_or_closed",
+      "last_checked": "2026-05-16"
+    },
+    {
+      "organizer": "SMIMC 國際兒童音樂營 (台北場)",
+      "url": "",
+      "reason": "全英文 + 國際師資、強度高,適合中階以上,且未取得 2026 確切日期",
+      "category": "out_of_scope_or_closed",
+      "last_checked": "2026-05-16"
+    },
+    {
+      "organizer": "新埔國小管樂團、大成國小管樂團",
+      "url": "",
+      "reason": "以本校校隊為主",
+      "category": "out_of_scope_or_closed",
+      "last_checked": "2026-05-16"
+    },
+    {
+      "organizer": "第 25 屆政大管樂營《風與影的通道》",
+      "url": "",
+      "reason": "2026/7/13–7/19,報名至 2026/4/30 已截止;對象為具管樂基礎合奏能力之應屆小六至高中職畢業生",
+      "category": "out_of_scope_or_closed",
+      "last_checked": "2026-05-16"
+    },
+    {
+      "organizer": "桃園長老教會 2026 暑期音樂營",
+      "url": "",
+      "reason": "課程為合唱、小提琴、大提琴、古典吉他等,未見管樂主軸",
+      "category": "no_winds_focus",
+      "last_checked": "2026-05-16"
+    },
+    {
+      "organizer": "2026 桃園管樂嘉年華室內樂大師班",
+      "url": "",
+      "reason": "日期在 6 月初,且需要團體演奏能力與影片",
+      "category": "no_winds_focus",
+      "last_checked": "2026-05-16"
+    },
+    {
+      "organizer": "2026 嘉義市國際管樂節",
+      "url": "",
+      "reason": "多為踩街、戶外音樂會;管樂節主體於 12 月底至 1 月初,非暑期",
+      "category": "no_winds_focus",
+      "last_checked": "2026-05-16"
+    },
+    {
+      "organizer": "臺北市 115 年度國民小學暑期體驗學習營",
+      "url": "https://holiday.tp.edu.tw/",
+      "reason": "簡章中未見管樂團/管樂營項目;入口性質,定期重查",
+      "category": "portal_recheck",
+      "last_checked": "2026-05-16"
+    },
+    {
+      "organizer": "新北市中小學寒暑期育樂營",
+      "url": "https://camp.ntpc.edu.tw/",
+      "reason": "5/19 中午 12:00 開放報名;入口性質,目前簡章中未見管樂團/管樂營主軸項目;定期重查",
+      "category": "portal_recheck",
+      "last_checked": "2026-05-16"
+    },
+    {
+      "organizer": "桃園市政府教育局 2026 暑期活動",
+      "url": "",
+      "reason": "公告 60+ 項暑期活動,未見管樂團/管樂營主軸項目;入口性質,定期重查",
+      "category": "portal_recheck",
+      "last_checked": "2026-05-16"
+    },
+    {
+      "organizer": "新莊國中、永和國中、福營國中、中和國小、新埔國小、大成國小等學校管樂團頁面",
+      "url": "",
+      "reason": "僅為團隊介紹或學期招生,未公告 2026 暑期具體活動與報名日期",
+      "category": "no_dates",
+      "last_checked": "2026-05-16"
+    },
+    {
+      "organizer": "桃園市立中興國中",
+      "url": "",
+      "reason": "提及 115 學年度管樂團招生,未公告暑期具體活動日期",
+      "category": "no_dates",
+      "last_checked": "2026-05-16"
+    },
+    {
+      "organizer": "新莊國中 115 學年度管樂團招生",
+      "url": "",
+      "reason": "有 Google 表單,但頁面未提供明確暑期活動日期與報名截止日",
+      "category": "no_dates",
+      "last_checked": "2026-05-16"
+    },
+    {
+      "organizer": "臺北市 114 年度國中階段暑期營隊彙整表",
+      "url": "",
+      "reason": "年份為 2025/114 年,不能放入 2026 清單",
+      "category": "wrong_year",
+      "last_checked": "2026-05-16"
+    },
+    {
+      "organizer": "台北流行音樂中心『北流歡樂島』樂器探索",
+      "url": "",
+      "reason": "兒童節 4 月活動,非暑期",
+      "category": "no_winds_focus",
+      "last_checked": "2026-05-16"
+    },
+    {
+      "organizer": "賦格音樂「兒童交響樂體驗」",
+      "url": "",
+      "reason": "體驗型,無管樂團主軸與固定日期",
+      "category": "no_winds_focus",
+      "last_checked": "2026-05-16"
+    },
+    {
+      "organizer": "NSYO 國家青年交響樂團",
+      "url": "",
+      "reason": "高齡層 (高中以上)、需甄選",
+      "category": "out_of_scope_or_closed",
+      "last_checked": "2026-05-16"
+    },
+    {
+      "organizer": "大墩陽光兒童夏夏令營",
+      "url": "",
+      "reason": "一般綜合性夏令營,無管樂主軸",
+      "category": "no_winds_focus",
+      "last_checked": "2026-05-16"
+    }
+  ],
+  "topic_tabs": [
+    {
+      "id": "music",
+      "source": "legacy_music",
+      "label": "音樂／管樂",
+      "title": "Anne 2026 暑期管樂團／管樂營 (北北桃)",
+      "subtitle": "適合國小高年級 · 有確認活動日期與報名日期 · 報名尚未截止",
+      "accent": "#1f4e78",
+      "north_heading": "符合條件 (北北桃)",
+      "other_heading": "其他條件符合,但地區不在北北桃 (參考)",
+      "pending_heading": "待查 (主辦單位已宣告 2026 開放報名,但搜尋尚未取得確切日期)",
+      "empty_message": "目前沒有音樂／管樂搜尋結果。"
+    },
+    {
+      "id": "performing-arts",
+      "label": "戲劇表演／音樂劇",
+      "title": "2026 戲劇表演／音樂劇夏令營搜尋結果",
+      "subtitle": "收納「戲劇表演」與「音樂劇」相關夏令營，欄位沿用舉辦單位、地點、日期、報名網頁，方便和音樂營隊並列比較。",
+      "accent": "#7c3f8c",
+      "north_heading": "搜尋結果 (北北桃)",
+      "other_heading": "其他地區搜尋結果 (參考)",
+      "pending_heading": "待查 / 後續搜尋追蹤",
+      "empty_message": "目前尚未匯入戲劇表演／音樂劇搜尋結果。",
+      "included_north": [
+        {
+          "id": "tpac-2026-youth-musical",
+          "organizer": "臺北表演藝術中心「2026 青少年夏日瘋劇場 — 音樂劇營《跟著阿嬤去旅行》」",
+          "location_lines": [
+            "臺北表演藝術中心 11F 排練室 1、2 (臺北市士林區劍潭路 1 號)"
+          ],
+          "activity_lines": [
+            "活動:2026/7/13 – 2026/7/25 每日 09:00–17:00 (第一梯)",
+            "活動:2026/7/27 – 2026/8/8 每日 09:00–17:00 (第二梯; 8/2 休息)"
+          ],
+          "registration_line": "報名:2026/5/11 12:00 至 2026/6/14 23:59",
+          "deadline_iso": "2026-06-14",
+          "links": [
+            {
+              "label": "活動頁",
+              "url": "https://tpac.org.taipei/event/1835"
+            },
+            {
+              "label": "報名表",
+              "url": "https://www.surveycake.com/s/lpZMr"
+            },
+            {
+              "label": "學校轉知公告",
+              "url": "https://www.bjes.tp.edu.tw/news/get/2281"
+            }
+          ],
+          "first_seen": "2026-05-15",
+          "last_changed": "2026-05-15",
+          "_internal_notes": "搜尋「2026 音樂劇 夏令營 台北 國小 報名」取得。北藝中心頁與濱江國小轉知公告均列課程對象、兩梯日期與報名期間。"
+        },
+        {
+          "id": "smartorange-2026-musical-taipei",
+          "organizer": "橙智國際教育集團「2026 橘子泥歌舞劇營」(台北)",
+          "location_lines": [
+            "橙智台北教育中心 (台北市信義區基隆路二段 51 號 14 樓，近台北 101 / 世貿捷運站)"
+          ],
+          "activity_lines": [
+            "活動:2026/7/13 – 2026/7/17 09:00–18:00 (第一梯)",
+            "活動:2026/7/27 – 2026/7/31 09:00–18:00 (第二梯)",
+            "活動:2026/8/3 – 2026/8/7 09:00–18:00 (第三梯)"
+          ],
+          "registration_line": "報名:線上報名開放中; 早鳥優惠至 2026/5/31，頁面未列統一截止日，依額滿或各梯開課前受理狀態為準",
+          "deadline_iso": "2026-07-13",
+          "links": [
+            {
+              "label": "活動與報名資訊頁",
+              "url": "https://www.smartorange.com.tw/summer-camp/2026sc_musical/"
+            }
+          ],
+          "first_seen": "2026-05-15",
+          "last_changed": "2026-05-15",
+          "_internal_notes": "搜尋「2026 音樂劇 夏令營 台北 國小 報名」取得。頁面列台北/新竹同開、三梯日期、台北中心地址、升小三至國二對象與早鳥日期；未找到統一報名截止日，deadline_iso 暫以第一梯開始日供 gate 參考。"
+        },
+        {
+          "id": "taipei-philharmonic-theatre-2026-arts-education",
+          "organizer": "愛樂劇工廠 2026 藝術教育夏令營",
+          "location_lines": [
+            "渴望會館 (桃園市龍潭區渴望路 428 號)"
+          ],
+          "activity_lines": [
+            "活動:2026/8/9 16:30 – 2026/8/15 14:50"
+          ],
+          "registration_line": "報名:Accupass 開放報名中; 早鳥優惠至 2026/6/30",
+          "deadline_iso": "2026-08-09",
+          "links": [
+            {
+              "label": "Accupass 活動頁",
+              "url": "https://www.accupass.com/event/2604220836091327294189"
+            },
+            {
+              "label": "完整營隊課程資料簡章",
+              "url": "https://ticf23.my.canva.site/"
+            }
+          ],
+          "first_seen": "2026-05-15",
+          "last_changed": "2026-05-15",
+          "_internal_notes": "搜尋「2026 戲劇表演 夏令營 台北 國小 報名」取得。Accupass 頁面列桃園龍潭住宿型營隊、升小四至國一、表藝領域包含戲劇表演畫面轉化；deadline_iso 暫以活動開始日供 gate 參考。"
+        }
+      ],
+      "included_other": [],
+      "pending": [
+        {
+          "id": "ccef-2026-performance-camps",
+          "title": "華視訓練中心 2026 兒童表演類夏令營",
+          "region_note": "地區: 台北; 類型: 戲劇表演 / 小小演員 / 英語戲劇等",
+          "body_lines": [
+            "已找到 2026 暑期營隊總頁與「小小表演班」課程說明，但待確認各班可報名梯次、確切活動日期與是否仍有名額。"
+          ],
+          "links": [
+            {
+              "label": "小小表演班頁",
+              "url": "https://www.ccef.org.tw/ccefkidswcamp15/"
+            }
+          ],
+          "first_seen": "2026-05-15",
+          "last_changed": "2026-05-15"
+        }
+      ]
+    }
   ]
 }
