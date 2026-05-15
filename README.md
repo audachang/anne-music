@@ -65,9 +65,13 @@ claude
 # → 跟隨指示,把 URL 在本機瀏覽器開啟,登入後把 code 貼回 server terminal
 # → 完成後憑證存在 ~/.claude/.credentials.json
 
-# 4. 重新認證 gh CLI (現有 token 已過期)
-gh auth login
-# → 選 GitHub.com / HTTPS / Login with a web browser → 貼 one-time code
+# 4. 重新認證 gh CLI — 用既有 PAT 檔
+#    PAT 檔在 ~/.ssh/.github_pat_audachang,環境變數格式 (GITHUB_TOKEN=ghp_xxx)
+set -a; source ~/.ssh/.github_pat_audachang; set +a
+echo "$GITHUB_TOKEN" | gh auth login --with-token
+unset GITHUB_TOKEN
+gh auth status   # 確認 ✓ Logged in to github.com account audachang
+# 之後 git push 會自動透過 ~/.gitconfig 裡的 `gh auth git-credential` helper 取 token,cron 也適用
 
 # 5. 確認 Python 套件
 pip3 install --user jinja2
