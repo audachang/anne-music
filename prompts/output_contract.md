@@ -21,10 +21,33 @@
   "last_updated": "YYYY-MM-DD",        // 每次跑都更新為 today
   "included_north": [Entry, ...],       // 北北桃符合
   "included_other": [Entry, ...],       // 其他地區同類型參考
-  "pending": [PendingEntry, ...],       // 待查
-  "excluded": [ExcludedEntry, ...]      // 已查並排除 (給未來避免重評估)
+  "pending": [PendingEntry, ...],       // 音樂／管樂待查
+  "excluded": [ExcludedEntry, ...],     // 音樂／管樂已查並排除 (給未來避免重評估)
+  "topic_tabs": [TopicTab, ...]         // 其他主題分頁,例如戲劇表演、音樂劇
 }
 ```
+
+
+### TopicTab (`topic_tabs`)
+
+`topic_tabs` 用於音樂／管樂以外的營隊主題分頁。`render.py` 會自動把既有 `included_north` / `included_other` / `pending` 當成預設「音樂／管樂」分頁,再依序渲染 `topic_tabs`。
+
+```jsonc
+{
+  "id": "drama",
+  "label": "戲劇表演",
+  "title": "Anne 2026 戲劇表演夏令營 (北北桃)",
+  "subtitle": "分頁說明文字",
+  "included_heading": "符合條件的戲劇表演營 (北北桃)",
+  "other_heading": "其他地區戲劇表演營 (參考)",
+  "pending_heading": "戲劇表演待查或資訊待補",
+  "included_north": [Entry, ...],
+  "included_other": [Entry, ...],
+  "pending": [PendingEntry, ...]
+}
+```
+
+其他主題的 `Entry` 與 `PendingEntry` 欄位沿用下方 schema。若主辦單位只有「立即報名／額滿為止」而無明確截止日,可在 `registration_line` 說明「名額／最終截止以主辦公告為準」,並用活動首日作為 `deadline_iso` 以利排序與提醒。
 
 ### Entry (`included_*`)
 

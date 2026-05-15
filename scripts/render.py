@@ -71,23 +71,41 @@ def main() -> int:
     )
     template = env.get_template(TEMPLATE_NAME)
 
-    included_north = state.get("included_north", [])
-    included_other = state.get("included_other", [])
-    pending = state.get("pending", [])
+    music_topic = {
+        "id": "music",
+        "label": "音樂／管樂",
+        "title": "Anne 2026 暑期管樂團／管樂營 (北北桃)",
+        "subtitle": "適合國小高年級 · 有確認活動日期與報名日期 · 報名尚未截止",
+        "included_heading": "符合條件 (北北桃)",
+        "other_heading": "其他條件符合,但地區不在北北桃 (參考)",
+        "pending_heading": "待查 (主辦單位已宣告 2026 開放報名,但搜尋尚未取得確切日期)",
+        "included_north": state.get("included_north", []),
+        "included_other": state.get("included_other", []),
+        "pending": state.get("pending", []),
+    }
+    topic_tabs = [music_topic, *state.get("topic_tabs", [])]
 
-    recent_changes = [
-        e for e in (included_north + included_other + pending) if is_recent(e)
-    ]
+    for topic in topic_tabs:
+        topic["recent_changes"] = [
+            e
+            for e in (
+                topic.get("included_north", [])
+                + topic.get("included_other", [])
+                + topic.get("pending", [])
+            )
+            if is_recent(e)
+        ]
+
+    recent_changes = [e for topic in topic_tabs for e in topic["recent_changes"]]
 
     html = template.render(
         last_updated=state.get("last_updated", today.isoformat()),
-        included_north=included_north,
-        included_other=included_other,
-        pending=pending,
+        topic_tabs=topic_tabs,
         recent_changes=recent_changes,
         row_class=row_class,
         badge=badge,
     )
+    html = "\n".join(line.rstrip() for line in html.splitlines()) + "\n"
     OUTPUT_PATH.write_text(html, encoding="utf-8")
     print(f"[render] wrote {OUTPUT_PATH} ({len(html)} bytes)")
     return 0
