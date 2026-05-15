@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8">
-<title>Anne 2026 暑期管樂團／管樂營 (北北桃)</title>
+<title>Anne 2026 暑期營隊清單 (北北桃)</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
   body {
@@ -62,6 +62,42 @@
   }
   a:hover { text-decoration: underline; }
 
+  .tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 18px 0 20px;
+    border-bottom: 1px solid #d9e0ea;
+  }
+  .tab-button {
+    appearance: none;
+    border: 1px solid #cbd6e2;
+    border-bottom: none;
+    border-radius: 10px 10px 0 0;
+    background: #eef3f8;
+    color: #33506d;
+    cursor: pointer;
+    font: inherit;
+    font-weight: 700;
+    margin-bottom: -1px;
+    padding: 10px 16px;
+  }
+  .tab-button:hover { background: #e3edf7; }
+  .tab-button.active {
+    background: #fff;
+    border-color: #1f4e78;
+    color: #1f4e78;
+  }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+  .empty-note {
+    background: #fff;
+    border: 1px dashed #cbd6e2;
+    border-radius: 8px;
+    color: #5c6b80;
+    padding: 14px 16px;
+  }
+
   h2.pending {
     margin: 28px 0 8px;
     color: #b26a00;
@@ -115,8 +151,8 @@
 <body>
 <div class="wrap">
 
-  <h1>Anne 2026 暑期管樂團／管樂營 (北北桃)</h1>
-  <div class="sub">適合國小高年級 · 有確認活動日期與報名日期 · 報名尚未截止</div>
+  <h1>Anne 2026 暑期營隊清單 (北北桃)</h1>
+  <div class="sub">依主題分頁整理 · 音樂／管樂維持預設分頁 · 戲劇表演與音樂劇可獨立追蹤搜尋結果</div>
 
   {% if recent_changes %}
   <div class="recent-summary">
@@ -125,77 +161,90 @@
   </div>
   {% endif %}
 
-  <h2 class="section">符合條件 (北北桃)</h2>
-  <table>
-    <thead>
-      <tr>
-        <th>舉辦單位</th>
-        <th>地點</th>
-        <th>日期</th>
-        <th>報名網頁</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for e in included_north %}
-      <tr class="{{ row_class(e) }}">
-        <td>{{ e.organizer }}{{ badge(e) | safe }}</td>
-        <td>{{ e.location_lines | join('<br>') | safe }}</td>
-        <td>
-          {% for line in e.activity_lines %}{{ line }}{% if not loop.last %};<br>{% endif %}{% endfor %}<br>
-          {{ e.registration_line }}
-        </td>
-        <td>
-          {% for link in e.links %}<a href="{{ link.url }}" target="_blank" rel="noopener">{{ link.label }}</a>{% if not loop.last %}<br>{% endif %}{% endfor %}
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-
-  {% if included_other %}
-  <h2 class="section alt">其他條件符合,但地區不在北北桃 (參考)</h2>
-  <table class="alt">
-    <thead>
-      <tr>
-        <th>舉辦單位</th>
-        <th>地點</th>
-        <th>日期</th>
-        <th>報名網頁</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for e in included_other %}
-      <tr class="{{ row_class(e) }}">
-        <td>{{ e.organizer }}{{ badge(e) | safe }}</td>
-        <td>{{ e.location_lines | join('<br>') | safe }}</td>
-        <td>
-          {% for line in e.activity_lines %}{{ line }}{% if not loop.last %};<br>{% endif %}{% endfor %}<br>
-          {{ e.registration_line }}
-        </td>
-        <td>
-          {% for link in e.links %}<a href="{{ link.url }}" target="_blank" rel="noopener">{{ link.label }}</a>{% if not loop.last %}<br>{% endif %}{% endfor %}
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-  {% endif %}
-
-  {% if pending %}
-  <h2 class="pending">待查 (主辦單位已宣告 2026 開放報名,但搜尋尚未取得確切日期)</h2>
-  <div class="pending-note">
-    {% for p in pending %}
-    <div class="pending-item">
-      <strong>{{ p.title }}</strong>{{ badge(p) | safe }} ({{ p.region_note }})<br>
-      {% for line in p.body_lines %}{{ line }}<br>{% endfor %}
-      {% for link in p.links %}<a href="{{ link.url }}" target="_blank" rel="noopener">{{ link.label }}</a>{% if not loop.last %} ‧ {% endif %}{% endfor %}
-    </div>
+  <div class="tabs" role="tablist" aria-label="夏令營主題">
+    {% for topic in topic_tabs %}
+    <button class="tab-button{% if loop.first %} active{% endif %}" type="button" role="tab" aria-selected="{{ 'true' if loop.first else 'false' }}" aria-controls="panel-{{ topic.id }}" id="tab-{{ topic.id }}" data-tab="{{ topic.id }}">{{ topic.label }}</button>
     {% endfor %}
   </div>
-  {% endif %}
+
+  {% macro render_table(entries, alt=False) -%}
+  <table{% if alt %} class="alt"{% endif %}>
+    <thead>
+      <tr>
+        <th>舉辦單位</th>
+        <th>地點</th>
+        <th>日期</th>
+        <th>報名網頁</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for e in entries %}
+      <tr class="{{ row_class(e) }}">
+        <td>{{ e.organizer }}{{ badge(e) | safe }}</td>
+        <td>{{ e.location_lines | join('<br>') | safe }}</td>
+        <td>
+          {% for line in e.activity_lines %}{{ line }}{% if not loop.last %};<br>{% endif %}{% endfor %}<br>
+          {{ e.registration_line }}
+        </td>
+        <td>
+          {% for link in e.links %}<a href="{{ link.url }}" target="_blank" rel="noopener">{{ link.label }}</a>{% if not loop.last %}<br>{% endif %}{% endfor %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {%- endmacro %}
+
+  {% for topic in topic_tabs %}
+  <section class="tab-panel{% if loop.first %} active{% endif %}" id="panel-{{ topic.id }}" role="tabpanel" aria-labelledby="tab-{{ topic.id }}">
+    <h1>{{ topic.title }}</h1>
+    <div class="sub">{{ topic.subtitle }}</div>
+
+    {% if topic.included_north %}
+    <h2 class="section">{{ topic.included_heading or '符合條件 (北北桃)' }}</h2>
+    {{ render_table(topic.included_north) }}
+    {% else %}
+    <h2 class="section">{{ topic.included_heading or '符合條件 (北北桃)' }}</h2>
+    <div class="empty-note">目前尚無已確認且符合條件的北北桃營隊。</div>
+    {% endif %}
+
+    {% if topic.included_other %}
+    <h2 class="section alt">{{ topic.other_heading or '其他條件符合,但地區不在北北桃 (參考)' }}</h2>
+    {{ render_table(topic.included_other, True) }}
+    {% endif %}
+
+    {% if topic.pending %}
+    <h2 class="pending">{{ topic.pending_heading or '待查' }}</h2>
+    <div class="pending-note">
+      {% for p in topic.pending %}
+      <div class="pending-item">
+        <strong>{{ p.title }}</strong>{{ badge(p) | safe }} ({{ p.region_note }})<br>
+        {% for line in p.body_lines %}{{ line }}<br>{% endfor %}
+        {% for link in p.links %}<a href="{{ link.url }}" target="_blank" rel="noopener">{{ link.label }}</a>{% if not loop.last %} ‧ {% endif %}{% endfor %}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </section>
+  {% endfor %}
 
   <div class="updated">最後更新:{{ last_updated }}</div>
 
 </div>
+<script>
+  document.querySelectorAll('.tab-button').forEach((button) => {
+    button.addEventListener('click', () => {
+      const tabId = button.dataset.tab;
+      document.querySelectorAll('.tab-button').forEach((tab) => {
+        const active = tab === button;
+        tab.classList.toggle('active', active);
+        tab.setAttribute('aria-selected', active ? 'true' : 'false');
+      });
+      document.querySelectorAll('.tab-panel').forEach((panel) => {
+        panel.classList.toggle('active', panel.id === `panel-${tabId}`);
+      });
+    });
+  });
+</script>
 </body>
 </html>
