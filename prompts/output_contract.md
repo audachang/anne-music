@@ -21,7 +21,8 @@
   "last_updated": "YYYY-MM-DD",        // 每次跑都更新為 today
   "included_north": [Entry, ...],       // 北北桃符合
   "included_other": [Entry, ...],       // 其他地區同類型參考
-  "pending": [PendingEntry, ...],       // 待查
+  "pending": [PendingEntry, ...],       // 音樂／管樂待查
+  "topic_tabs": [TopicTab, ...],        // 頁面分頁設定; 音樂預設分頁 source=legacy_music
   "excluded": [ExcludedEntry, ...]      // 已查並排除 (給未來避免重評估)
 }
 ```
@@ -45,6 +46,27 @@
   "_internal_notes": "agent 內部判斷依據,不會渲染到 HTML"
 }
 ```
+
+### TopicTab (`topic_tabs`)
+
+`topic_tabs` 用於渲染頁面分頁。音樂／管樂預設分頁必須保留 `source: "legacy_music"`,其資料仍來自舊有的 `included_north` / `included_other` / `pending`。其他主題分頁可有自己的 `included_north` / `included_other` / `pending`。
+
+```jsonc
+{
+  "id": "music",
+  "source": "legacy_music",              // 只有音樂預設分頁使用
+  "label": "音樂／管樂",
+  "title": "Anne 2026 暑期管樂團／管樂營 (北北桃)",
+  "subtitle": "適合國小高年級 ...",
+  "accent": "#1f4e78",
+  "north_heading": "符合條件 (北北桃)",
+  "other_heading": "其他條件符合,但地區不在北北桃 (參考)",
+  "pending_heading": "待查 ...",
+  "empty_message": "目前沒有音樂／管樂搜尋結果。"
+}
+```
+
+新增非音樂主題時使用同一組 `Entry` / `PendingEntry` 結構放在該 topic 底下,例如戲劇表演／音樂劇分頁。
 
 ### PendingEntry (`pending`)
 

@@ -4,7 +4,7 @@
 
 ## 1. 目標
 
-為 Anne 維護 2026 暑期可參加的管樂團/管樂營活動清單,範圍以**北北桃 (臺北市、新北市、桃園市)** 為主,結果寫入 `data/state.json`。HTML 由 `scripts/render.py` 從 state.json 自動渲染,**不需手動編輯 HTML**。
+為 Anne 維護 2026 暑期可參加的營隊活動清單。預設主題仍為管樂團/管樂營,範圍以**北北桃 (臺北市、新北市、桃園市)** 為主;頁面另可用 `topic_tabs` 放入其他主題 (目前包含戲劇表演／音樂劇搜尋結果)。結果寫入 `data/state.json`。HTML 由 `scripts/render.py` 從 state.json 自動渲染,**不需手動編輯 HTML**。
 
 對象:**國小高年級、單簧管學習約一年**。
 
@@ -83,6 +83,7 @@
 
 ### Step E — 寫入 state.json
 - `last_updated = today`
+- 保留 `topic_tabs`；音樂預設分頁的 `source: "legacy_music"` 會自動引用頂層音樂資料,不要把頂層音樂 entries 複製進該分頁
 - 新增 entry:`first_seen = last_changed = today`
 - 修改 entry:只更 `last_changed = today`,`first_seen` 不動
 - 移除 entry:不要直接刪除,移到 `excluded` 區塊保留歷史

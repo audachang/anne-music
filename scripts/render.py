@@ -57,6 +57,63 @@ def make_helpers(today: date):
     return is_recent, row_class, badge
 
 
+def topic_count(topic: dict) -> int:
+    return (
+        len(topic.get("included_north", []))
+        + len(topic.get("included_other", []))
+        + len(topic.get("pending", []))
+    )
+
+
+def legacy_music_topic(state: dict) -> dict:
+    return {
+        "id": "music",
+        "label": "音樂／管樂",
+        "title": "Anne 2026 暑期管樂團／管樂營 (北北桃)",
+        "subtitle": "適合國小高年級 · 有確認活動日期與報名日期 · 報名尚未截止",
+        "accent": "#1f4e78",
+        "north_heading": "符合條件 (北北桃)",
+        "other_heading": "其他條件符合,但地區不在北北桃 (參考)",
+        "pending_heading": "待查 (主辦單位已宣告 2026 開放報名,但搜尋尚未取得確切日期)",
+        "empty_message": "目前沒有音樂／管樂搜尋結果。",
+        "included_north": state.get("included_north", []),
+        "included_other": state.get("included_other", []),
+        "pending": state.get("pending", []),
+    }
+
+
+def normalize_topic(topic: dict, defaults: dict | None = None) -> dict:
+    normalized = dict(defaults or {})
+    normalized.update(topic)
+    normalized.setdefault("accent", "#1f4e78")
+    normalized.setdefault("north_heading", "符合條件 (北北桃)")
+    normalized.setdefault("other_heading", "其他條件符合,但地區不在北北桃 (參考)")
+    normalized.setdefault("pending_heading", "待查 / 搜尋後續追蹤")
+    normalized.setdefault("empty_message", "目前尚未匯入這個主題的搜尋結果。")
+    normalized.setdefault("included_north", [])
+    normalized.setdefault("included_other", [])
+    normalized.setdefault("pending", [])
+    normalized["total_count"] = topic_count(normalized)
+    return normalized
+
+
+def build_topics(state: dict, is_recent) -> list[dict]:
+    music_defaults = legacy_music_topic(state)
+    raw_topics = state.get("topic_tabs")
+    if raw_topics:
+        topics = []
+        for raw in raw_topics:
+            defaults = music_defaults if raw.get("source") == "legacy_music" else None
+            topics.append(normalize_topic(raw, defaults))
+    else:
+        topics = [normalize_topic(music_defaults)]
+
+    for topic in topics:
+        entries = topic.get("included_north", []) + topic.get("included_other", []) + topic.get("pending", [])
+        topic["recent_changes"] = [e for e in entries if is_recent(e)]
+    return topics
+
+
 def main() -> int:
     state = json.loads(STATE_PATH.read_text(encoding="utf-8"))
 
@@ -71,20 +128,11 @@ def main() -> int:
     )
     template = env.get_template(TEMPLATE_NAME)
 
-    included_north = state.get("included_north", [])
-    included_other = state.get("included_other", [])
-    pending = state.get("pending", [])
-
-    recent_changes = [
-        e for e in (included_north + included_other + pending) if is_recent(e)
-    ]
+    topics = build_topics(state, is_recent)
 
     html = template.render(
         last_updated=state.get("last_updated", today.isoformat()),
-        included_north=included_north,
-        included_other=included_other,
-        pending=pending,
-        recent_changes=recent_changes,
+        topics=topics,
         row_class=row_class,
         badge=badge,
     )

@@ -14,6 +14,16 @@ WINDOW_DAYS = 7
 STATE_PATH = Path(__file__).resolve().parent.parent / "data" / "state.json"
 
 
+def deadline_entries(state: dict) -> list[dict]:
+    entries = state.get("included_north", []) + state.get("included_other", [])
+    for topic in state.get("topic_tabs", []):
+        if topic.get("source") == "legacy_music":
+            continue
+        entries.extend(topic.get("included_north", []))
+        entries.extend(topic.get("included_other", []))
+    return entries
+
+
 def main() -> int:
     today = date.today()
 
@@ -25,7 +35,7 @@ def main() -> int:
     cutoff = today + timedelta(days=WINDOW_DAYS)
 
     upcoming = []
-    for entry in state.get("included_north", []) + state.get("included_other", []):
+    for entry in deadline_entries(state):
         ds = entry.get("deadline_iso")
         if not ds:
             continue
