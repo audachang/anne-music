@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>Anne 2026 暑期管樂團／管樂營 (北北桃)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  body {
+    font-family: "Noto Sans TC", "Microsoft JhengHei", "PingFang TC", sans-serif;
+    margin: 0;
+    padding: 32px 20px;
+    background: #f7f8fa;
+    color: #1a2330;
+    line-height: 1.65;
+  }
+  .wrap { max-width: 1000px; margin: 0 auto; }
+  h1 {
+    font-size: 1.4rem;
+    color: #1f4e78;
+    margin: 0 0 4px;
+  }
+  .sub {
+    color: #5c6b80;
+    font-size: 0.92rem;
+    margin-bottom: 24px;
+  }
+  h2.section {
+    margin: 30px 0 8px;
+    color: #1f4e78;
+    font-size: 1.1rem;
+  }
+  h2.section.alt { color: #6a4d24; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border: 1px solid #d9e0ea;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+  th, td {
+    padding: 12px 14px;
+    border-bottom: 1px solid #e6ebf2;
+    text-align: left;
+    vertical-align: top;
+    font-size: 0.96rem;
+  }
+  th {
+    background: #1f4e78;
+    color: #fff;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  table.alt th { background: #8d6a2c; }
+  tr:last-child td { border-bottom: none; }
+  tr:nth-child(even) td { background: #f4f7fb; }
+  table.alt tr:nth-child(even) td { background: #fbf6ec; }
+  a {
+    color: #1f4e78;
+    word-break: break-all;
+  }
+  a:hover { text-decoration: underline; }
+
+  h2.pending {
+    margin: 28px 0 8px;
+    color: #b26a00;
+    font-size: 1.05rem;
+  }
+  .pending-note {
+    background: #fff8e1;
+    border: 1px solid #ffd592;
+    border-radius: 6px;
+    padding: 12px 16px;
+    font-size: 0.93rem;
+    color: #5c4a00;
+  }
+  .pending-note a { color: #b26a00; }
+  .pending-item + .pending-item { margin-top: 12px; padding-top: 12px; border-top: 1px dashed #ffd592; }
+
+  .updated {
+    text-align: right;
+    color: #8a96a8;
+    font-size: 0.82rem;
+    margin-top: 18px;
+  }
+
+  /* Recent change badges */
+  .badge {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 1px 7px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    border-radius: 10px;
+    vertical-align: middle;
+    line-height: 1.5;
+  }
+  .badge.new { background: #e6f4ea; color: #137333; border: 1px solid #b6e0c2; }
+  .badge.updated { background: #fff4e5; color: #a85d00; border: 1px solid #ffd29c; }
+  tr.row-recent td:first-child { border-left: 3px solid #34a853; }
+  tr.row-updated td:first-child { border-left: 3px solid #f59e0b; }
+  .recent-summary {
+    margin: 8px 0 14px;
+    padding: 10px 14px;
+    background: #eef7ee;
+    border: 1px solid #c8e6c9;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    color: #1b5e20;
+  }
+  .recent-summary strong { color: #137333; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>Anne 2026 暑期管樂團／管樂營 (北北桃)</h1>
+  <div class="sub">適合國小高年級 · 有確認活動日期與報名日期 · 報名尚未截止</div>
+
+  {% if recent_changes %}
+  <div class="recent-summary">
+    <strong>最近 7 天有變動:</strong>
+    {% for r in recent_changes %}{{ r.organizer or r.title }}{% if not loop.last %} · {% endif %}{% endfor %}
+  </div>
+  {% endif %}
+
+  <h2 class="section">符合條件 (北北桃)</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>舉辦單位</th>
+        <th>地點</th>
+        <th>日期</th>
+        <th>報名網頁</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for e in included_north %}
+      <tr class="{{ row_class(e) }}">
+        <td>{{ e.organizer }}{{ badge(e) | safe }}</td>
+        <td>{{ e.location_lines | join('<br>') | safe }}</td>
+        <td>
+          {% for line in e.activity_lines %}{{ line }}{% if not loop.last %};<br>{% endif %}{% endfor %}<br>
+          {{ e.registration_line }}
+        </td>
+        <td>
+          {% for link in e.links %}<a href="{{ link.url }}" target="_blank" rel="noopener">{{ link.label }}</a>{% if not loop.last %}<br>{% endif %}{% endfor %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {% if included_other %}
+  <h2 class="section alt">其他條件符合,但地區不在北北桃 (參考)</h2>
+  <table class="alt">
+    <thead>
+      <tr>
+        <th>舉辦單位</th>
+        <th>地點</th>
+        <th>日期</th>
+        <th>報名網頁</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for e in included_other %}
+      <tr class="{{ row_class(e) }}">
+        <td>{{ e.organizer }}{{ badge(e) | safe }}</td>
+        <td>{{ e.location_lines | join('<br>') | safe }}</td>
+        <td>
+          {% for line in e.activity_lines %}{{ line }}{% if not loop.last %};<br>{% endif %}{% endfor %}<br>
+          {{ e.registration_line }}
+        </td>
+        <td>
+          {% for link in e.links %}<a href="{{ link.url }}" target="_blank" rel="noopener">{{ link.label }}</a>{% if not loop.last %}<br>{% endif %}{% endfor %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+
+  {% if pending %}
+  <h2 class="pending">待查 (主辦單位已宣告 2026 開放報名,但搜尋尚未取得確切日期)</h2>
+  <div class="pending-note">
+    {% for p in pending %}
+    <div class="pending-item">
+      <strong>{{ p.title }}</strong>{{ badge(p) | safe }} ({{ p.region_note }})<br>
+      {% for line in p.body_lines %}{{ line }}<br>{% endfor %}
+      {% for link in p.links %}<a href="{{ link.url }}" target="_blank" rel="noopener">{{ link.label }}</a>{% if not loop.last %} ‧ {% endif %}{% endfor %}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="updated">最後更新:{{ last_updated }}</div>
+
+</div>
+</body>
+</html>
