@@ -6,8 +6,12 @@
 #   0 1 * * * /home/aclexp/anne-music/scripts/refresh.sh >> /home/aclexp/anne-music/.cron.log 2>&1
 set -euo pipefail
 
+# cron has minimal PATH; explicitly include npm-global for `claude` and `gh`
+export PATH="$HOME/.npm-global/bin:$HOME/bin:/usr/local/bin:/usr/bin:/bin"
+
 REPO_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO_DIR"
+echo "[$(date -Iseconds)] PATH=$PATH"
 
 TODAY="$(date -I)"
 echo "===== refresh start $TODAY ====="
