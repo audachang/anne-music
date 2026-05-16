@@ -99,6 +99,49 @@ python3 scripts/render.py
 # 開啟 docs/index.html 預覽
 ```
 
+## 即時關鍵字搜尋 API
+
+GitHub Pages 只能提供靜態檔案,瀏覽器不能安全地直接執行全網搜尋。若要讓頁面上的「新增關鍵字」先實質上網搜尋再建立 tab,需要啟動後端搜尋服務:
+
+```bash
+python3 scripts/search_server.py
+# local preview: http://127.0.0.1:8765/
+# API: POST http://127.0.0.1:8765/api/search-topic {"keyword":"舞蹈"}
+```
+
+`search_server.py` 會提供 `docs/` 靜態頁,並在 `/api/search-topic` 用 `scripts/search_topic.py` 執行 server-side web search,回傳可直接渲染為 tab 的 JSON。正式部署時,將同一服務放在可被 GitHub Pages 呼叫的 HTTPS endpoint,或在頁面載入前設定:
+
+```html
+<script>window.ANNE_SEARCH_ENDPOINT = "https://your-domain.example/api/search-topic";</script>
+```
+
+若仍只部署到 GitHub Pages 而沒有這個 API,頁面會提示「搜尋後端未部署」,不會把本地資料篩選結果誤當成即時網路搜尋。
+
+### braina-aclexp 部署筆記
+
+在 server 上拉到最新版後,可先用 user-level systemd 常駐 API:
+
+```bash
+cd ~/anne-music
+git pull origin main
+mkdir -p ~/.config/systemd/user
+cp deploy/anne-music-search.service ~/.config/systemd/user/
+systemctl --user daemon-reload
+systemctl --user enable --now anne-music-search.service
+systemctl --user status anne-music-search.service
+curl -sS -X POST http://127.0.0.1:8765/api/search-topic \
+  -H 'Content-Type: application/json' \
+  -d '{"keyword":"舞蹈","max_results":1}'
+```
+
+GitHub Pages 是 HTTPS,正式頁面不能呼叫 `http://89.167.10.76:8765` 這類 HTTP API。需要將 `deploy/nginx-anne-music-search.conf.example` 改成實際 domain,用 nginx 反代到 `127.0.0.1:8765`,再用 certbot 啟用 HTTPS。
+
+HTTPS API 可用後,更新 `docs/search-config.js`:
+
+```js
+window.ANNE_SEARCH_ENDPOINT = "https://your-api-domain.example/api/search-topic";
+```
+
 ## 監控
 
 `refresh.sh` 失敗會留在 `.cron.log`。要被通知,在 `refresh.sh` 末尾加 webhook:

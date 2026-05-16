@@ -103,6 +103,11 @@
     padding: 8px 12px;
   }
   .topic-search button:hover { background: #173d5f; }
+  .topic-search button:disabled {
+    background: #8a96a8;
+    border-color: #8a96a8;
+    cursor: wait;
+  }
   .topic-filter {
     background: #fff;
     border: 1px solid #d9e0ea;
@@ -248,7 +253,7 @@
     <form class="topic-search" id="topic-search">
       <label for="topic-keyword">新增關鍵字</label>
       <input id="topic-keyword" name="keyword" type="search" autocomplete="off" placeholder="例如: 舞蹈、科學、籃球">
-      <button type="submit">搜尋</button>
+      <button type="submit">上網搜尋</button>
       <div class="topic-status" id="topic-status" role="status" aria-live="polite"></div>
     </form>
 
@@ -337,12 +342,17 @@
   </section>
 </template>
 <script id="topic-data" type="application/json">{{ topic_tabs | tojson }}</script>
+<script src="search-config.js"></script>
 <script>
   const STORAGE_KEY = 'anneMusicVisibleTopics';
   const CUSTOM_KEY = 'anneMusicCustomTopics';
+  const SEARCH_ENDPOINT = window.ANNE_SEARCH_ENDPOINT || '/api/search-topic';
   const topicTabs = document.querySelector('#topic-tabs');
   const topicList = document.querySelector('#topic-list');
   const topicStatus = document.querySelector('#topic-status');
+  const topicForm = document.querySelector('#topic-search');
+  const topicInput = document.querySelector('#topic-keyword');
+  const topicSubmit = topicForm.querySelector('button[type="submit"]');
   const topicData = JSON.parse(document.querySelector('#topic-data').textContent);
   const tabRegistry = new Map();
 
@@ -387,42 +397,14 @@
     return `custom-${Math.abs(hash).toString(36)}`;
   }
 
-  function allEntries() {
-    return topicData.flatMap((topic) => [
-      ...(topic.included_north || []).map((entry) => ({ ...entry, sourceTopic: topic.label, group: '北北桃' })),
-      ...(topic.included_other || []).map((entry) => ({ ...entry, sourceTopic: topic.label, group: '其他地區' })),
-      ...(topic.pending || []).map((entry) => ({
-        organizer: entry.title,
-        location_lines: [entry.region_note],
-        activity_lines: entry.body_lines || [],
-        registration_line: '待查',
-        links: entry.links || [],
-        sourceTopic: topic.label,
-        group: '待查',
-      })),
-    ]);
-  }
-
-  function entryText(entry) {
-    return [
-      entry.organizer,
-      entry.sourceTopic,
-      entry.group,
-      ...(entry.location_lines || []),
-      ...(entry.activity_lines || []),
-      entry.registration_line,
-      ...(entry.links || []).flatMap((link) => [link.label, link.url]),
-    ].join(' ').toLowerCase();
-  }
-
   function renderResultTable(entries) {
     if (entries.length === 0) {
-      return '<div class="empty-note">目前既有資料中沒有符合此關鍵字的營隊。</div>';
+      return '<div class="empty-note">即時搜尋沒有回傳可呈現的結果。</div>';
     }
 
     const rows = entries.map((entry) => `
       <tr>
-        <td>${escapeHtml(entry.organizer)}<br><small>${escapeHtml(entry.sourceTopic)} · ${escapeHtml(entry.group)}</small></td>
+        <td>${escapeHtml(entry.organizer)}</td>
         <td>${(entry.location_lines || []).map(escapeHtml).join('<br>')}</td>
         <td>${(entry.activity_lines || []).map(escapeHtml).join(';<br>')}<br>${escapeHtml(entry.registration_line)}</td>
         <td>${(entry.links || []).map((link) => `<a href="${escapeHtml(link.url)}" target="_blank" rel="noopener">${escapeHtml(link.label)}</a>`).join('<br>')}</td>
@@ -498,10 +480,37 @@
     });
   }
 
-  function addCustomTopic(keyword, persist = true) {
-    const cleanKeyword = normalizeKeyword(keyword);
+  async function fetchOnlineTopic(keyword) {
+    const response = await fetch(SEARCH_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ keyword }),
+    });
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw new Error(payload.error || `搜尋服務回應 ${response.status}`);
+    }
+    return payload;
+  }
+
+  function normalizeTopicPayload(topic, keyword) {
+    const cleanKeyword = normalizeKeyword(topic.label || keyword);
+    return {
+      id: topic.id || makeCustomId(cleanKeyword),
+      label: cleanKeyword,
+      title: topic.title || `Anne 2026 ${cleanKeyword}夏令營搜尋`,
+      subtitle: topic.subtitle || `即時網路搜尋「${cleanKeyword}」`,
+      included_north: topic.included_north || [],
+      included_other: topic.included_other || [],
+      pending: topic.pending || [],
+    };
+  }
+
+  function addCustomTopic(topic, persist = true) {
+    const normalizedTopic = normalizeTopicPayload(topic, topic.label);
+    const cleanKeyword = normalizeKeyword(normalizedTopic.label);
     if (!cleanKeyword) return;
-    const tabId = makeCustomId(cleanKeyword);
+    const tabId = normalizedTopic.id;
     const existing = tabRegistry.get(tabId);
     if (existing) {
       setTabVisibility(tabId, true);
@@ -510,7 +519,17 @@
       return;
     }
 
-    const matches = allEntries().filter((entry) => entryText(entry).includes(cleanKeyword.toLowerCase()));
+    const entries = [
+      ...normalizedTopic.included_north,
+      ...normalizedTopic.included_other,
+      ...normalizedTopic.pending.map((entry) => ({
+        organizer: entry.title,
+        location_lines: [entry.region_note],
+        activity_lines: entry.body_lines || [],
+        registration_line: '待確認',
+        links: entry.links || [],
+      })),
+    ];
     const button = document.createElement('button');
     button.className = 'tab-button';
     button.type = 'button';
@@ -527,21 +546,21 @@
     const panel = template.querySelector('section');
     panel.id = `panel-${tabId}`;
     panel.setAttribute('aria-labelledby', button.id);
-    panel.querySelector('h1').textContent = `Anne 2026 ${cleanKeyword}夏令營`;
-    panel.querySelector('.sub').textContent = `自訂關鍵字「${cleanKeyword}」符合 ${matches.length} 筆既有資料`;
-    panel.querySelector('.custom-results').innerHTML = renderResultTable(matches);
+    panel.querySelector('h1').textContent = normalizedTopic.title;
+    panel.querySelector('.sub').textContent = `${normalizedTopic.subtitle}，共 ${entries.length} 筆結果`;
+    panel.querySelector('.custom-results').innerHTML = renderResultTable(entries);
     document.querySelector('.updated').before(panel);
 
     registerTab(button, panel, cleanKeyword);
     renderTopicList();
     setTabVisibility(tabId, true);
     activateTab(tabId);
-    topicStatus.textContent = `已新增「${cleanKeyword}」分頁，找到 ${matches.length} 筆既有資料。`;
+    topicStatus.textContent = `已新增「${cleanKeyword}」分頁，找到 ${entries.length} 筆即時搜尋結果。`;
 
     if (persist) {
       const customTopics = loadJson(CUSTOM_KEY, []);
-      if (!customTopics.includes(cleanKeyword)) {
-        customTopics.push(cleanKeyword);
+      if (!customTopics.some((saved) => saved.id === normalizedTopic.id)) {
+        customTopics.push(normalizedTopic);
         saveJson(CUSTOM_KEY, customTopics);
       }
     }
@@ -552,7 +571,10 @@
     registerTab(button, document.querySelector(`#panel-${cssEscape(tabId)}`), button.dataset.label || button.textContent);
   });
 
-  loadJson(CUSTOM_KEY, []).forEach((keyword) => addCustomTopic(keyword, false));
+  loadJson(CUSTOM_KEY, []).forEach((saved) => {
+    if (typeof saved === 'string') return;
+    addCustomTopic(saved, false);
+  });
   const savedVisible = loadJson(STORAGE_KEY, {});
   tabRegistry.forEach((item, id) => {
     if (Object.prototype.hasOwnProperty.call(savedVisible, id)) {
@@ -565,11 +587,22 @@
   if ([...tabRegistry.values()].every((item) => item.hidden)) setTabVisibility('music', true);
   activateTab([...tabRegistry.values()].find((item) => !item.hidden)?.button.dataset.tab);
 
-  document.querySelector('#topic-search').addEventListener('submit', (event) => {
+  topicForm.addEventListener('submit', async (event) => {
     event.preventDefault();
-    const input = document.querySelector('#topic-keyword');
-    addCustomTopic(input.value);
-    input.value = '';
+    const keyword = normalizeKeyword(topicInput.value);
+    if (!keyword) return;
+
+    topicSubmit.disabled = true;
+    topicStatus.textContent = `正在上網搜尋「${keyword}」...`;
+    try {
+      const topic = await fetchOnlineTopic(keyword);
+      addCustomTopic(topic);
+      topicInput.value = '';
+    } catch (error) {
+      topicStatus.textContent = `無法完成即時上網搜尋：${error.message}。請確認搜尋後端已部署並可由此頁呼叫。`;
+    } finally {
+      topicSubmit.disabled = false;
+    }
   });
 </script>
 </body>

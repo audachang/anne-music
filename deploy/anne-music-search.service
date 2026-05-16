@@ -1,0 +1,16 @@
+[Unit]
+Description=Anne Music live topic search API
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/anne-music
+Environment=PORT=8765
+Environment=ANNE_ALLOWED_ORIGIN=https://audachang.github.io
+ExecStart=/usr/bin/python3 scripts/search_server.py
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target
