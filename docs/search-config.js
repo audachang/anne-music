@@ -1,3 +1,1 @@
-// Set this after deploying scripts/search_server.py behind HTTPS.
-// Example:
-// window.ANNE_SEARCH_ENDPOINT = "https://api.example.org/api/search-topic";
+window.ANNE_SEARCH_ENDPOINT = "https://moltbot-server.tail58869e.ts.net:8443/api/search-topic";

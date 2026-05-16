@@ -134,13 +134,21 @@ curl -sS -X POST http://127.0.0.1:8765/api/search-topic \
   -d '{"keyword":"舞蹈","max_results":1}'
 ```
 
-GitHub Pages 是 HTTPS,正式頁面不能呼叫 `http://89.167.10.76:8765` 這類 HTTP API。需要將 `deploy/nginx-anne-music-search.conf.example` 改成實際 domain,用 nginx 反代到 `127.0.0.1:8765`,再用 certbot 啟用 HTTPS。
+GitHub Pages 是 HTTPS,正式頁面不能呼叫 `http://34.80.2.227:8765` 這類 HTTP API。braino-audachang 目前使用 Tailscale Funnel 公開 HTTPS API:
+
+```bash
+tailscale funnel --bg --yes --https=8443 \
+  --set-path=/api/search-topic \
+  http://127.0.0.1:8765/api/search-topic
+```
 
 HTTPS API 可用後,更新 `docs/search-config.js`:
 
 ```js
-window.ANNE_SEARCH_ENDPOINT = "https://your-api-domain.example/api/search-topic";
+window.ANNE_SEARCH_ENDPOINT = "https://moltbot-server.tail58869e.ts.net:8443/api/search-topic";
 ```
+
+若日後改用自有 domain,可將 `deploy/nginx-anne-music-search.conf.example` 改成實際 domain,用 nginx 反代到 `127.0.0.1:8765`,再用 certbot 啟用 HTTPS。
 
 ## 監控
 
