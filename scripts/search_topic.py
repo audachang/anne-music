@@ -38,6 +38,44 @@ DIRECT_INFO_TERMS = [
     "招生對象",
     "參加對象",
 ]
+BEGINNER_FRIENDLY_TERMS = [
+    "初學",
+    "零基礎",
+    "無基礎",
+    "不需基礎",
+    "不用基礎",
+    "基礎班",
+    "入門",
+    "體驗",
+    "啟蒙",
+    "兒童",
+    "國小",
+    "小學生",
+    "低年級",
+    "中年級",
+    "高年級",
+    "新手",
+    "興趣",
+]
+ADVANCED_TERMS = [
+    "甄選",
+    "徵選",
+    " audition",
+    "大師班",
+    "進階",
+    "專業",
+    "培訓",
+    "比賽",
+    "需具備",
+    "具基礎",
+    "一年以上",
+    "兩年以上",
+    "三年以上",
+    "中階",
+    "高階",
+    "高中以上",
+    "大學生",
+]
 GENERIC_RESULT_TERMS = [
     "完整攻略",
     "懶人包",
@@ -57,6 +95,14 @@ PORTAL_PAGE_TERMS = [
     "錄取名單",
     "搜尋營隊",
     "營隊查詢",
+]
+NON_DIRECT_DOMAINS = [
+    "youtube.com",
+    "youtu.be",
+    "facebook.com",
+    "instagram.com",
+    "threads.net",
+    "tiktok.com",
 ]
 
 
@@ -234,8 +280,15 @@ def is_generic_result(title: str, snippet: str, page_text: str) -> bool:
     return False
 
 
+def is_non_direct_url(url: str) -> bool:
+    host = urllib.parse.urlparse(url).netloc.lower()
+    return any(domain in host for domain in NON_DIRECT_DOMAINS)
+
+
 def direct_info_score(keyword: str, result: SearchResult) -> int:
     text = f"{result.title} {result.snippet} {result.page_text}"
+    if is_non_direct_url(result.url):
+        return 0
     if is_generic_result(result.title, result.snippet, result.page_text):
         return 0
     if keyword not in f"{result.title} {result.snippet} {result.page_text[:5000]}":
@@ -257,17 +310,73 @@ def direct_info_score(keyword: str, result: SearchResult) -> int:
     return score
 
 
+def relevance_score(keyword: str, result: SearchResult) -> int:
+    title = result.title
+    snippet = result.snippet
+    early_page = result.page_text[:5000]
+    text = f"{title} {snippet} {early_page}"
+
+    score = 0
+    if keyword in title:
+        score += 10
+    if keyword in snippet:
+        score += 5
+    if keyword in early_page:
+        score += 3
+    if "夏令營" in title or "暑期營" in title or "營隊" in title:
+        score += 5
+    elif "夏令營" in text or "暑期營" in text or "營隊" in text:
+        score += 3
+    if "報名" in title or "立即報名" in text or "線上報名" in text:
+        score += 4
+    if any(place in text for place in ["台北", "臺北", "新北", "桃園"]):
+        score += 2
+    return score
+
+
+def beginner_score(result: SearchResult) -> int:
+    text = f"{result.title} {result.snippet} {result.page_text[:8000]}"
+    score = 0
+    for term in BEGINNER_FRIENDLY_TERMS:
+        if term in text:
+            score += 2
+    if "國小" in text and "國中" in text:
+        score += 1
+    if "6-" in text or "7-" in text or "8-" in text:
+        score += 1
+    return min(score, 12)
+
+
+def advanced_penalty(result: SearchResult) -> int:
+    text = f"{result.title} {result.snippet} {result.page_text[:8000]}".lower()
+    penalty = 0
+    for term in ADVANCED_TERMS:
+        if term.lower() in text:
+            penalty += 3
+    return min(penalty, 15)
+
+
+def ranking_score(keyword: str, result: SearchResult) -> int:
+    return (
+        direct_info_score(keyword, result)
+        + relevance_score(keyword, result)
+        + beginner_score(result)
+        - advanced_penalty(result)
+    )
+
+
 def direct_results(keyword: str, max_results: int) -> list[SearchResult]:
     candidates = search_web(keyword, max_results=max(FETCH_LIMIT, max_results * 4))
-    accepted: list[SearchResult] = []
+    accepted: list[tuple[int, int, SearchResult]] = []
     for candidate in candidates:
         candidate.page_text = fetch_page_text(candidate.url)
-        if direct_info_score(keyword, candidate) < 7:
+        direct_score = direct_info_score(keyword, candidate)
+        if direct_score < 7:
             continue
-        accepted.append(candidate)
-        if len(accepted) >= max_results:
-            break
-    return accepted
+        accepted.append((ranking_score(keyword, candidate), direct_score, candidate))
+
+    accepted.sort(key=lambda item: (item[0], item[1]), reverse=True)
+    return [candidate for _, _, candidate in accepted[:max_results]]
 
 
 def result_to_entry(keyword: str, result: SearchResult, index: int, today: str) -> dict:
