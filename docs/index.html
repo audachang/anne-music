@@ -149,12 +149,15 @@
   }
   .tab-button {
     appearance: none;
+    align-items: center;
     border: 1px solid #cbd6e2;
     border-bottom: none;
     border-radius: 10px 10px 0 0;
     background: #eef3f8;
     color: #33506d;
     cursor: pointer;
+    display: inline-flex;
+    gap: 8px;
     font: inherit;
     font-weight: 700;
     margin-bottom: -1px;
@@ -165,6 +168,30 @@
     background: #fff;
     border-color: #1f4e78;
     color: #1f4e78;
+  }
+  .tab-close {
+    align-items: center;
+    appearance: none;
+    background: transparent;
+    border: 0;
+    border-radius: 50%;
+    color: inherit;
+    cursor: pointer;
+    display: inline-flex;
+    font: inherit;
+    font-size: 1rem;
+    font-weight: 700;
+    height: 18px;
+    justify-content: center;
+    line-height: 1;
+    margin: 0 -5px 0 0;
+    padding: 0;
+    width: 18px;
+  }
+  .tab-close:hover,
+  .tab-close:focus-visible {
+    background: #dbe7f3;
+    outline: none;
   }
   .tab-button[hidden] { display: none; }
   .tab-panel { display: none; }
@@ -623,9 +650,23 @@
     persistVisibleTopics();
   }
 
-  function registerTab(button, panel, label, hidden = false) {
+  function removeCustomTopic(tabId) {
+    const item = tabRegistry.get(tabId);
+    if (!item || !item.custom) return;
+    const wasActive = item.button.classList.contains('active');
+    item.button.remove();
+    item.panel.remove();
+    tabRegistry.delete(tabId);
+    saveJson(CUSTOM_KEY, loadJson(CUSTOM_KEY, []).filter((topic) => topic.id !== tabId));
+    persistVisibleTopics();
+    renderTopicList();
+    if (wasActive) activateTab();
+    topicStatus.textContent = `已刪除「${item.label}」分頁。`;
+  }
+
+  function registerTab(button, panel, label, hidden = false, custom = false) {
     const tabId = button.dataset.tab;
-    tabRegistry.set(tabId, { button, panel, label, hidden });
+    tabRegistry.set(tabId, { button, panel, label, hidden, custom });
     button.addEventListener('click', () => {
       if (!tabRegistry.get(tabId)?.hidden) activateTab(tabId);
     });
@@ -641,6 +682,19 @@
       checkbox.checked = !item.hidden;
       checkbox.addEventListener('change', () => setTabVisibility(id, checkbox.checked));
       label.append(checkbox, document.createTextNode(item.label));
+      if (item.custom) {
+        const deleteButton = document.createElement('button');
+        deleteButton.type = 'button';
+        deleteButton.className = 'tab-close';
+        deleteButton.setAttribute('aria-label', `刪除${item.label}分頁`);
+        deleteButton.textContent = '×';
+        deleteButton.addEventListener('click', (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          removeCustomTopic(id);
+        });
+        label.append(deleteButton);
+      }
       topicList.append(label);
     });
   }
@@ -704,7 +758,25 @@
     button.dataset.label = cleanKeyword;
     button.setAttribute('aria-selected', 'false');
     button.setAttribute('aria-controls', `panel-${tabId}`);
-    button.textContent = cleanKeyword;
+    button.append(document.createTextNode(cleanKeyword));
+    const closeButton = document.createElement('span');
+    closeButton.role = 'button';
+    closeButton.tabIndex = 0;
+    closeButton.className = 'tab-close';
+    closeButton.setAttribute('aria-label', `刪除${cleanKeyword}分頁`);
+    closeButton.textContent = '×';
+    closeButton.addEventListener('click', (event) => {
+      event.stopPropagation();
+      removeCustomTopic(tabId);
+    });
+    closeButton.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        event.stopPropagation();
+        removeCustomTopic(tabId);
+      }
+    });
+    button.append(closeButton);
     topicTabs.append(button);
 
     const template = document.querySelector('#topic-panel-template').content.cloneNode(true);
@@ -716,7 +788,7 @@
     panel.querySelector('.custom-results').innerHTML = renderResultTable(entries);
     document.querySelector('.updated').before(panel);
 
-    registerTab(button, panel, cleanKeyword);
+    registerTab(button, panel, cleanKeyword, false, true);
     renderTopicList();
     setTabVisibility(tabId, true);
     activateTab(tabId);

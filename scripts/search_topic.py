@@ -22,6 +22,42 @@ from html.parser import HTMLParser
 USER_AGENT = "anne-music-topic-search/1.0 (+https://audachang.github.io/anne-music/)"
 SEARCH_URL = "https://duckduckgo.com/html/"
 MAX_RESULTS = 8
+FETCH_LIMIT = 24
+PAGE_TEXT_LIMIT = 50000
+DIRECT_INFO_TERMS = [
+    "報名",
+    "線上報名",
+    "立即報名",
+    "報名表",
+    "活動日期",
+    "課程日期",
+    "營隊日期",
+    "上課日期",
+    "活動地點",
+    "上課地點",
+    "招生對象",
+    "參加對象",
+]
+GENERIC_RESULT_TERMS = [
+    "完整攻略",
+    "懶人包",
+    "總整理",
+    "全解析",
+    "推薦",
+    "比較",
+    "怎麼選",
+    "入口",
+    "平台",
+    "搜尋",
+    "查詢",
+]
+PORTAL_PAGE_TERMS = [
+    "各營隊內容頁",
+    "我的錄取",
+    "錄取名單",
+    "搜尋營隊",
+    "營隊查詢",
+]
 
 
 class SearchError(RuntimeError):
@@ -33,6 +69,7 @@ class SearchResult:
     title: str
     url: str
     snippet: str
+    page_text: str = ""
 
 
 class DuckDuckGoHTMLParser(HTMLParser):
@@ -76,6 +113,29 @@ class DuckDuckGoHTMLParser(HTMLParser):
                 self.results.append(SearchResult(title=title, url=url, snippet=snippet))
                 self._pending_result = None
             self._in_snippet = False
+
+
+class PageTextParser(HTMLParser):
+    def __init__(self) -> None:
+        super().__init__()
+        self.parts: list[str] = []
+        self._skip_depth = 0
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        if tag in {"script", "style", "noscript", "svg"}:
+            self._skip_depth += 1
+
+    def handle_endtag(self, tag: str) -> None:
+        if tag in {"script", "style", "noscript", "svg"} and self._skip_depth:
+            self._skip_depth -= 1
+
+    def handle_data(self, data: str) -> None:
+        if self._skip_depth == 0 and data.strip():
+            self.parts.append(data)
+
+    @property
+    def text(self) -> str:
+        return normalize_space(" ".join(self.parts))
 
 
 def normalize_space(value: str) -> str:
@@ -136,20 +196,105 @@ def search_web(keyword: str, max_results: int = MAX_RESULTS) -> list[SearchResul
     return deduped
 
 
+def fetch_page_text(url: str) -> str:
+    request = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
+    try:
+        with urllib.request.urlopen(request, timeout=12) as response:
+            content_type = response.headers.get("Content-Type", "")
+            if "text/html" not in content_type and "application/xhtml" not in content_type:
+                return ""
+            body = response.read(PAGE_TEXT_LIMIT).decode(
+                response.headers.get_content_charset() or "utf-8",
+                errors="replace",
+            )
+    except OSError:
+        return ""
+
+    parser = PageTextParser()
+    parser.feed(body)
+    return parser.text
+
+
+def has_date_signal(text: str) -> bool:
+    return bool(
+        re.search(r"20[2-3]\d[./年-]\s*\d{1,2}", text)
+        or re.search(r"115\s*[./年-]\s*\d{1,2}", text)
+        or re.search(r"\d{1,2}\s*/\s*\d{1,2}", text)
+    )
+
+
+def is_generic_result(title: str, snippet: str, page_text: str) -> bool:
+    title_snippet = f"{title} {snippet}"
+    if any(term in title_snippet for term in GENERIC_RESULT_TERMS):
+        return True
+    if any(term in page_text[:5000] for term in PORTAL_PAGE_TERMS):
+        return True
+    if "報名" not in page_text and any(term in page_text[:3000] for term in GENERIC_RESULT_TERMS):
+        return True
+    return False
+
+
+def direct_info_score(keyword: str, result: SearchResult) -> int:
+    text = f"{result.title} {result.snippet} {result.page_text}"
+    if is_generic_result(result.title, result.snippet, result.page_text):
+        return 0
+    if keyword not in f"{result.title} {result.snippet} {result.page_text[:5000]}":
+        return 0
+
+    score = 0
+    if keyword in text:
+        score += 1
+    if "夏令營" in text or "暑期營" in text or "營隊" in text:
+        score += 2
+    if "報名" in text:
+        score += 3
+    if has_date_signal(text):
+        score += 2
+    if any(place in text for place in ["台北", "臺北", "新北", "桃園"]):
+        score += 1
+    if any(term in text for term in DIRECT_INFO_TERMS):
+        score += 2
+    return score
+
+
+def direct_results(keyword: str, max_results: int) -> list[SearchResult]:
+    candidates = search_web(keyword, max_results=max(FETCH_LIMIT, max_results * 4))
+    accepted: list[SearchResult] = []
+    for candidate in candidates:
+        candidate.page_text = fetch_page_text(candidate.url)
+        if direct_info_score(keyword, candidate) < 7:
+            continue
+        accepted.append(candidate)
+        if len(accepted) >= max_results:
+            break
+    return accepted
+
+
 def result_to_entry(keyword: str, result: SearchResult, index: int, today: str) -> dict:
-    snippet = result.snippet or "搜尋結果未提供摘要；請開啟連結確認活動日期、報名資格與截止日。"
+    snippet = result.snippet or excerpt_page_text(result.page_text)
     return {
         "id": f"{stable_id(keyword)}-{index + 1}",
         "organizer": result.title,
-        "location_lines": ["搜尋結果，地點待開啟來源確認"],
+        "location_lines": ["直接報名資訊頁，詳細地點請以來源頁面為準"],
         "activity_lines": [f"摘要:{snippet}"],
-        "registration_line": "報名:請依來源頁面確認",
+        "registration_line": "報名:來源頁面含報名資訊，請開啟確認名額與截止日",
         "deadline_iso": today,
-        "links": [{"label": "搜尋結果來源", "url": result.url}],
+        "links": [{"label": "報名資訊頁", "url": result.url}],
         "first_seen": today,
         "last_changed": today,
-        "_internal_notes": f"User-triggered web search keyword: {keyword}",
+        "_internal_notes": f"User-triggered direct-info web search keyword: {keyword}",
     }
+
+
+def excerpt_page_text(page_text: str) -> str:
+    if not page_text:
+        return "來源頁面含報名相關資訊；請開啟確認活動日期、報名資格與截止日。"
+    for marker in ["報名", "活動日期", "課程日期", "營隊日期"]:
+        index = page_text.find(marker)
+        if index >= 0:
+            start = max(0, index - 60)
+            return page_text[start : start + 220]
+    return page_text[:220]
 
 
 def search_topic(keyword: str, max_results: int = MAX_RESULTS) -> dict:
@@ -158,7 +303,7 @@ def search_topic(keyword: str, max_results: int = MAX_RESULTS) -> dict:
         raise ValueError("keyword is required")
 
     today = date.today().isoformat()
-    results = search_web(clean_keyword, max_results=max_results)
+    results = direct_results(clean_keyword, max_results=max_results)
     entries = [
         result_to_entry(clean_keyword, result, index, today)
         for index, result in enumerate(results)
@@ -167,7 +312,7 @@ def search_topic(keyword: str, max_results: int = MAX_RESULTS) -> dict:
         "id": stable_id(clean_keyword),
         "label": clean_keyword,
         "title": f"Anne 2026 {clean_keyword}夏令營搜尋",
-        "subtitle": f"即時網路搜尋「{make_query(clean_keyword)}」；結果需開啟來源頁面確認細節。",
+        "subtitle": f"即時網路搜尋「{make_query(clean_keyword)}」；已過濾需再自行搜尋的彙整頁，只保留直接報名資訊頁。",
         "included_heading": "即時搜尋結果",
         "other_heading": "其他地區搜尋結果",
         "pending_heading": "待確認結果",
@@ -180,6 +325,8 @@ def search_topic(keyword: str, max_results: int = MAX_RESULTS) -> dict:
 
 
 def main() -> int:
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")
     parser = argparse.ArgumentParser()
     parser.add_argument("keyword")
     parser.add_argument("--max-results", type=int, default=MAX_RESULTS)
