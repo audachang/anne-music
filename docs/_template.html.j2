@@ -62,11 +62,83 @@
   }
   a:hover { text-decoration: underline; }
 
+  .topic-tools {
+    display: grid;
+    gap: 14px;
+    margin: 18px 0 18px;
+  }
+  .topic-search {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    background: #fff;
+    border: 1px solid #d9e0ea;
+    border-radius: 8px;
+    padding: 12px;
+  }
+  .topic-search label {
+    color: #33506d;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .topic-search input {
+    flex: 1 1 220px;
+    min-width: 0;
+    border: 1px solid #cbd6e2;
+    border-radius: 6px;
+    color: #1a2330;
+    font: inherit;
+    padding: 8px 10px;
+  }
+  .topic-search button {
+    appearance: none;
+    border: 1px solid #1f4e78;
+    border-radius: 6px;
+    background: #1f4e78;
+    color: #fff;
+    cursor: pointer;
+    font: inherit;
+    font-weight: 700;
+    padding: 8px 12px;
+  }
+  .topic-search button:hover { background: #173d5f; }
+  .topic-filter {
+    background: #fff;
+    border: 1px solid #d9e0ea;
+    border-radius: 8px;
+    padding: 10px 12px;
+  }
+  .topic-filter-title {
+    color: #33506d;
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .topic-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 14px;
+  }
+  .topic-list label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #1a2330;
+    font-size: 0.92rem;
+  }
+  .topic-list input { accent-color: #1f4e78; }
+  .topic-status {
+    color: #5c6b80;
+    flex-basis: 100%;
+    font-size: 0.86rem;
+    min-height: 1.2em;
+  }
   .tabs {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
-    margin: 18px 0 20px;
+    margin: 0 0 20px;
     border-bottom: 1px solid #d9e0ea;
   }
   .tab-button {
@@ -88,8 +160,10 @@
     border-color: #1f4e78;
     color: #1f4e78;
   }
+  .tab-button[hidden] { display: none; }
   .tab-panel { display: none; }
   .tab-panel.active { display: block; }
+  .tab-panel[hidden] { display: none; }
   .empty-note {
     background: #fff;
     border: 1px dashed #cbd6e2;
@@ -146,6 +220,15 @@
     color: #1b5e20;
   }
   .recent-summary strong { color: #137333; }
+
+  @media (max-width: 640px) {
+    body { padding: 22px 14px; }
+    .topic-search { align-items: stretch; }
+    .topic-search label,
+    .topic-search input,
+    .topic-search button { flex-basis: 100%; }
+    .tab-button { flex: 1 1 auto; padding: 9px 10px; }
+  }
 </style>
 </head>
 <body>
@@ -161,9 +244,23 @@
   </div>
   {% endif %}
 
-  <div class="tabs" role="tablist" aria-label="夏令營主題">
+  <div class="topic-tools" aria-label="主題控制">
+    <form class="topic-search" id="topic-search">
+      <label for="topic-keyword">新增關鍵字</label>
+      <input id="topic-keyword" name="keyword" type="search" autocomplete="off" placeholder="例如: 舞蹈、科學、籃球">
+      <button type="submit">搜尋</button>
+      <div class="topic-status" id="topic-status" role="status" aria-live="polite"></div>
+    </form>
+
+    <div class="topic-filter">
+      <div class="topic-filter-title">顯示類別</div>
+      <div class="topic-list" id="topic-list"></div>
+    </div>
+  </div>
+
+  <div class="tabs" id="topic-tabs" role="tablist" aria-label="夏令營主題">
     {% for topic in topic_tabs %}
-    <button class="tab-button{% if loop.first %} active{% endif %}" type="button" role="tab" aria-selected="{{ 'true' if loop.first else 'false' }}" aria-controls="panel-{{ topic.id }}" id="tab-{{ topic.id }}" data-tab="{{ topic.id }}">{{ topic.label }}</button>
+    <button class="tab-button{% if loop.first %} active{% endif %}" type="button" role="tab" aria-selected="{{ 'true' if loop.first else 'false' }}" aria-controls="panel-{{ topic.id }}" id="tab-{{ topic.id }}" data-tab="{{ topic.id }}" data-label="{{ topic.label }}">{{ topic.label }}</button>
     {% endfor %}
   </div>
 
@@ -231,19 +328,248 @@
   <div class="updated">最後更新:{{ last_updated }}</div>
 
 </div>
+<template id="topic-panel-template">
+  <section class="tab-panel" role="tabpanel">
+    <h1></h1>
+    <div class="sub"></div>
+    <h2 class="section">符合關鍵字的營隊</h2>
+    <div class="custom-results"></div>
+  </section>
+</template>
+<script id="topic-data" type="application/json">{{ topic_tabs | tojson }}</script>
 <script>
-  document.querySelectorAll('.tab-button').forEach((button) => {
-    button.addEventListener('click', () => {
-      const tabId = button.dataset.tab;
-      document.querySelectorAll('.tab-button').forEach((tab) => {
-        const active = tab === button;
-        tab.classList.toggle('active', active);
-        tab.setAttribute('aria-selected', active ? 'true' : 'false');
-      });
-      document.querySelectorAll('.tab-panel').forEach((panel) => {
-        panel.classList.toggle('active', panel.id === `panel-${tabId}`);
-      });
+  const STORAGE_KEY = 'anneMusicVisibleTopics';
+  const CUSTOM_KEY = 'anneMusicCustomTopics';
+  const topicTabs = document.querySelector('#topic-tabs');
+  const topicList = document.querySelector('#topic-list');
+  const topicStatus = document.querySelector('#topic-status');
+  const topicData = JSON.parse(document.querySelector('#topic-data').textContent);
+  const tabRegistry = new Map();
+
+  function cssEscape(value) {
+    if (window.CSS?.escape) return CSS.escape(value);
+    return String(value).replace(/["\\]/g, '\\$&');
+  }
+
+  function loadJson(key, fallback) {
+    try {
+      return JSON.parse(localStorage.getItem(key)) ?? fallback;
+    } catch {
+      return fallback;
+    }
+  }
+
+  function saveJson(key, value) {
+    try {
+      localStorage.setItem(key, JSON.stringify(value));
+    } catch {
+      topicStatus.textContent = '瀏覽器未儲存這次的顯示設定。';
+    }
+  }
+
+  function escapeHtml(value) {
+    return String(value ?? '').replace(/[&<>"']/g, (char) => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;',
+    }[char]));
+  }
+
+  function normalizeKeyword(value) {
+    return value.trim().replace(/\s+/g, ' ');
+  }
+
+  function makeCustomId(keyword) {
+    let hash = 0;
+    for (const char of keyword) hash = ((hash << 5) - hash + char.charCodeAt(0)) | 0;
+    return `custom-${Math.abs(hash).toString(36)}`;
+  }
+
+  function allEntries() {
+    return topicData.flatMap((topic) => [
+      ...(topic.included_north || []).map((entry) => ({ ...entry, sourceTopic: topic.label, group: '北北桃' })),
+      ...(topic.included_other || []).map((entry) => ({ ...entry, sourceTopic: topic.label, group: '其他地區' })),
+      ...(topic.pending || []).map((entry) => ({
+        organizer: entry.title,
+        location_lines: [entry.region_note],
+        activity_lines: entry.body_lines || [],
+        registration_line: '待查',
+        links: entry.links || [],
+        sourceTopic: topic.label,
+        group: '待查',
+      })),
+    ]);
+  }
+
+  function entryText(entry) {
+    return [
+      entry.organizer,
+      entry.sourceTopic,
+      entry.group,
+      ...(entry.location_lines || []),
+      ...(entry.activity_lines || []),
+      entry.registration_line,
+      ...(entry.links || []).flatMap((link) => [link.label, link.url]),
+    ].join(' ').toLowerCase();
+  }
+
+  function renderResultTable(entries) {
+    if (entries.length === 0) {
+      return '<div class="empty-note">目前既有資料中沒有符合此關鍵字的營隊。</div>';
+    }
+
+    const rows = entries.map((entry) => `
+      <tr>
+        <td>${escapeHtml(entry.organizer)}<br><small>${escapeHtml(entry.sourceTopic)} · ${escapeHtml(entry.group)}</small></td>
+        <td>${(entry.location_lines || []).map(escapeHtml).join('<br>')}</td>
+        <td>${(entry.activity_lines || []).map(escapeHtml).join(';<br>')}<br>${escapeHtml(entry.registration_line)}</td>
+        <td>${(entry.links || []).map((link) => `<a href="${escapeHtml(link.url)}" target="_blank" rel="noopener">${escapeHtml(link.label)}</a>`).join('<br>')}</td>
+      </tr>
+    `).join('');
+
+    return `
+      <table>
+        <thead>
+          <tr>
+            <th>舉辦單位</th>
+            <th>地點</th>
+            <th>日期</th>
+            <th>報名網頁</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    `;
+  }
+
+  function activateTab(tabId) {
+    const nextTab = tabRegistry.get(tabId)?.button || [...tabRegistry.values()].find((item) => !item.hidden)?.button;
+    if (!nextTab) return;
+    const nextId = nextTab.dataset.tab;
+    tabRegistry.forEach((item, id) => {
+      const active = id === nextId;
+      item.button.classList.toggle('active', active);
+      item.button.setAttribute('aria-selected', active ? 'true' : 'false');
+      item.panel.classList.toggle('active', active);
     });
+  }
+
+  function persistVisibleTopics() {
+    const visible = {};
+    tabRegistry.forEach((item, id) => {
+      visible[id] = !item.hidden;
+    });
+    saveJson(STORAGE_KEY, visible);
+  }
+
+  function setTabVisibility(tabId, visible) {
+    const item = tabRegistry.get(tabId);
+    if (!item) return;
+    item.hidden = !visible;
+    item.button.hidden = !visible;
+    item.panel.hidden = !visible;
+    const checkbox = topicList.querySelector(`input[value="${cssEscape(tabId)}"]`);
+    if (checkbox) checkbox.checked = visible;
+    if (!visible && item.button.classList.contains('active')) activateTab();
+    persistVisibleTopics();
+  }
+
+  function registerTab(button, panel, label, hidden = false) {
+    const tabId = button.dataset.tab;
+    tabRegistry.set(tabId, { button, panel, label, hidden });
+    button.addEventListener('click', () => {
+      if (!tabRegistry.get(tabId)?.hidden) activateTab(tabId);
+    });
+  }
+
+  function renderTopicList() {
+    topicList.innerHTML = '';
+    tabRegistry.forEach((item, id) => {
+      const label = document.createElement('label');
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.value = id;
+      checkbox.checked = !item.hidden;
+      checkbox.addEventListener('change', () => setTabVisibility(id, checkbox.checked));
+      label.append(checkbox, document.createTextNode(item.label));
+      topicList.append(label);
+    });
+  }
+
+  function addCustomTopic(keyword, persist = true) {
+    const cleanKeyword = normalizeKeyword(keyword);
+    if (!cleanKeyword) return;
+    const tabId = makeCustomId(cleanKeyword);
+    const existing = tabRegistry.get(tabId);
+    if (existing) {
+      setTabVisibility(tabId, true);
+      activateTab(tabId);
+      topicStatus.textContent = `已切換到「${cleanKeyword}」。`;
+      return;
+    }
+
+    const matches = allEntries().filter((entry) => entryText(entry).includes(cleanKeyword.toLowerCase()));
+    const button = document.createElement('button');
+    button.className = 'tab-button';
+    button.type = 'button';
+    button.role = 'tab';
+    button.id = `tab-${tabId}`;
+    button.dataset.tab = tabId;
+    button.dataset.label = cleanKeyword;
+    button.setAttribute('aria-selected', 'false');
+    button.setAttribute('aria-controls', `panel-${tabId}`);
+    button.textContent = cleanKeyword;
+    topicTabs.append(button);
+
+    const template = document.querySelector('#topic-panel-template').content.cloneNode(true);
+    const panel = template.querySelector('section');
+    panel.id = `panel-${tabId}`;
+    panel.setAttribute('aria-labelledby', button.id);
+    panel.querySelector('h1').textContent = `Anne 2026 ${cleanKeyword}夏令營`;
+    panel.querySelector('.sub').textContent = `自訂關鍵字「${cleanKeyword}」符合 ${matches.length} 筆既有資料`;
+    panel.querySelector('.custom-results').innerHTML = renderResultTable(matches);
+    document.querySelector('.updated').before(panel);
+
+    registerTab(button, panel, cleanKeyword);
+    renderTopicList();
+    setTabVisibility(tabId, true);
+    activateTab(tabId);
+    topicStatus.textContent = `已新增「${cleanKeyword}」分頁，找到 ${matches.length} 筆既有資料。`;
+
+    if (persist) {
+      const customTopics = loadJson(CUSTOM_KEY, []);
+      if (!customTopics.includes(cleanKeyword)) {
+        customTopics.push(cleanKeyword);
+        saveJson(CUSTOM_KEY, customTopics);
+      }
+    }
+  }
+
+  document.querySelectorAll('.tab-button').forEach((button) => {
+    const tabId = button.dataset.tab;
+    registerTab(button, document.querySelector(`#panel-${cssEscape(tabId)}`), button.dataset.label || button.textContent);
+  });
+
+  loadJson(CUSTOM_KEY, []).forEach((keyword) => addCustomTopic(keyword, false));
+  const savedVisible = loadJson(STORAGE_KEY, {});
+  tabRegistry.forEach((item, id) => {
+    if (Object.prototype.hasOwnProperty.call(savedVisible, id)) {
+      item.hidden = !savedVisible[id];
+      item.button.hidden = item.hidden;
+      item.panel.hidden = item.hidden;
+    }
+  });
+  renderTopicList();
+  if ([...tabRegistry.values()].every((item) => item.hidden)) setTabVisibility('music', true);
+  activateTab([...tabRegistry.values()].find((item) => !item.hidden)?.button.dataset.tab);
+
+  document.querySelector('#topic-search').addEventListener('submit', (event) => {
+    event.preventDefault();
+    const input = document.querySelector('#topic-keyword');
+    addCustomTopic(input.value);
+    input.value = '';
   });
 </script>
 </body>
