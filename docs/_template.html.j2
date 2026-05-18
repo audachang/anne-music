@@ -358,6 +358,8 @@
   </section>
   {% endfor %}
 
+  <div id="custom-panels"></div>
+
   <div class="updated">最後更新:{{ last_updated }}</div>
 
 </div>
@@ -381,6 +383,7 @@
   const topicForm = document.querySelector('#topic-search');
   const topicInput = document.querySelector('#topic-keyword');
   const topicSubmit = topicForm.querySelector('button[type="submit"]');
+  const customPanels = document.querySelector('#custom-panels');
   const topicData = JSON.parse(document.querySelector('#topic-data').textContent);
   const tabRegistry = new Map();
 
@@ -463,6 +466,7 @@
       item.button.classList.toggle('active', active);
       item.button.setAttribute('aria-selected', active ? 'true' : 'false');
       item.panel.classList.toggle('active', active);
+      item.panel.hidden = item.hidden || !active;
     });
   }
 
@@ -503,6 +507,7 @@
   function registerTab(button, panel, label, hidden = false, custom = false) {
     const tabId = button.dataset.tab;
     tabRegistry.set(tabId, { button, panel, label, hidden, custom });
+    panel.hidden = hidden || !button.classList.contains('active');
     button.addEventListener('click', () => {
       if (!tabRegistry.get(tabId)?.hidden) activateTab(tabId);
     });
@@ -622,7 +627,7 @@
     panel.querySelector('h1').textContent = normalizedTopic.title;
     panel.querySelector('.sub').textContent = `${normalizedTopic.subtitle}，共 ${entries.length} 筆結果`;
     panel.querySelector('.custom-results').innerHTML = renderResultTable(entries);
-    document.querySelector('.updated').before(panel);
+    customPanels.append(panel);
 
     registerTab(button, panel, cleanKeyword, false, true);
     renderTopicList();
